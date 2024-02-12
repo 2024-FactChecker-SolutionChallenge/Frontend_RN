@@ -77,7 +77,7 @@ const LearnScreen = () => {
         setIsLoading(true)
         // For text-only input, use the gemini-pro model
         const model = genAI.getGenerativeModel({ model: "gemini-pro"});
-        const prompt = `${selectedWordsGroup}의 맥락에서 ${word}의 뜻을 1~2줄 이내로 아주 이해하기 쉽게 알려줘. 답변의 총 길이는 1~2줄 이내여야 해. 그리고 답변의 스타일은 사전에 쓰인 뜻을 그대로 알려주는 느낌으로 답변해줘.`
+        const prompt = `${selectedWordsGroup} -> 이 맥락에서 ${word}가 쓰였어. 이 때 이 맥락에서 ${word}의 뜻을 사전에서 찾아 1~2줄 이내로 아주 이해하기 쉽게 알려줘. 답변의 총 길이는 1~2줄 이내여야 해. 그리고 답변의 스타일은 사전에 쓰인 뜻을 그대로 알려주는 느낌으로 답변해줘.`
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const text = response.text();

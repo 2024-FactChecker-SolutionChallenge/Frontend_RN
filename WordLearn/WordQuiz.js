@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, Button, FlatList, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native'
 // import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // Dummy data for words
@@ -65,9 +66,15 @@ export function QuizHomeScreen({ navigation }) {
                     disabled={quizTaken}
                     style={styles.bannedQuiz}
                     >
-                    <Text style={styles.banned}>Banned</Text>
+                    <Text style={styles.banned}>1 chance</Text>
+                    <Text style={styles.banned}>/ 100₩</Text>
                 </TouchableOpacity>
                 <Text style={styles.bannedText}>No more chances left!</Text>
+                <TouchableOpacity>
+                    <View style={styles.payButton}>
+                        <Text style={styles.payButtonText}>Get more chances!</Text>
+                    </View>
+                </TouchableOpacity>
             </>
             :  
             <TouchableOpacity
@@ -81,6 +88,7 @@ export function QuizHomeScreen({ navigation }) {
                     imageStyle={{ borderRadius: 150 }}
                 >
                     <Text style={styles.startQuizbuttonText}>START</Text>
+                    <Text style={styles.chanceLeftText}>Chances left : 1</Text>
                 </ImageBackground>
             </TouchableOpacity>
             }
@@ -92,12 +100,23 @@ export function QuizHomeScreen({ navigation }) {
 
 // Quiz Screen component
 // Quiz Screen component
-export function QuizScreen({ navigation }) {
+export function QuizScreen({ navigation, setShowSwiperButtons }) {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [remainingTime, setRemainingTime] = useState(5); // 5 seconds countdown
     const [userAnswers, setUserAnswers] = useState([]);
     const [words, setWords] = useState(dummy_words); 
     const [options, setOptions] = useState([])
+
+    useFocusEffect(
+        React.useCallback(() => {
+            // QuizScreen이 포커스 될 때
+            setShowSwiperButtons(false);
+            return () => {
+                // QuizScreen이 포커스를 잃을 때
+                setShowSwiperButtons(true);
+            };
+        }, [])
+    );
 
     // 현재 질문의 단어 가져오기
     const currentWord = currentQuestionIndex < dummy_words.length 
@@ -191,13 +210,30 @@ export function QuizScreen({ navigation }) {
 
 
 // Results Screen component
-export function ResultsScreen({ route, navigation }) {
+export function ResultsScreen({ route, navigation}) {
     const [words, setWords] = useState(null);
     const [totalScore, setTotalScore] = useState(0);
+    
 
-    useEffect(() =>{
-        route && setWords(route.params.words);
-    }, [route]);
+    // useFocusEffect(
+    //     React.useCallback(() => {
+    //         console.log('ResultsScreen is focused, setting ShowSwiperButtons to false');
+    //         setShowSwiperButtons(false);
+    
+    //         return () => {
+    //             console.log('ResultsScreen is losing focus, setting ShowSwiperButtons to true');
+    //             setShowSwiperButtons(true);
+    //         };
+    //     }, [route.params])
+    // );
+    
+
+    useEffect(() => {
+        if (route.params?.words) {
+            setWords(route.params.words);
+        }
+    }, [route.params]);
+    
 
     useEffect(() => {
         if (words) {
@@ -299,6 +335,13 @@ const styles = StyleSheet.create({
         textAlign : 'center',
         top : "110%"
     },
+    chanceLeftText : {
+        fontSize : 20,
+        color : '#55433B',
+        fontWeight : '500',
+        textAlign : 'center',
+        top : "113%"
+    },
     bannedQuiz :{
         backgroundColor: '#ff7e54',
         padding: 10,
@@ -341,6 +384,20 @@ const styles = StyleSheet.create({
     },
     marginBox : {
         minHeight : "17%"
+    },
+    payButton : {
+        minWidth : "70%",
+        backgroundColor : '#ff7e54',
+        marginTop : 20,
+        paddingVertical : 10,
+        borderRadius : 15
+    },
+    payButtonText : {
+        textAlign : 'center',
+        color : 'white',
+        borderRadius : 20,
+        fontWeight : "500",
+        fontSize : 18,
     },
 
 

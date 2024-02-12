@@ -4,19 +4,30 @@ import Swiper from 'react-native-swiper';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { QuizHomeScreen, QuizScreen, ResultsScreen } from './WordQuiz';
 import VocabularyLearningScreen from './WordFlipCard';
+import { useNavigation } from '@react-navigation/native';
+
 
 const QuizStack = createNativeStackNavigator();
 
 
-const QuizNavigator = () => {
+const QuizNavigator = ({ setShowSwiperButtons }) => {
     return (
-        <QuizStack.Navigator initialRouteName="QuizHome">
-            <QuizStack.Screen name="QuizHome" component={QuizHomeScreen} options={{ headerShown: false }} />
-            <QuizStack.Screen name="Quiz" component={QuizScreen} options={{ headerShown: false }} />
-            <QuizStack.Screen name="Results" component={ResultsScreen} options={{ headerShown: false }} />
-        </QuizStack.Navigator>
+    <QuizStack.Navigator initialRouteName="QuizHome">
+        <QuizStack.Screen name="QuizHome" component={QuizHomeScreen} options={{ headerShown: false }} />
+        <QuizStack.Screen 
+        name="Quiz" 
+        options={{ headerShown: false }}>
+        {props => <QuizScreen {...props} setShowSwiperButtons={setShowSwiperButtons} />}
+        </QuizStack.Screen>
+        <QuizStack.Screen 
+        name="Results" 
+        options={{ headerShown: false }}>
+        {props => <ResultsScreen {...props} setShowSwiperButtons={setShowSwiperButtons} />}
+        </QuizStack.Screen>
+    </QuizStack.Navigator>
     );
 };
+
 
 // Assuming you have a function to fetch words from your backend
 const fetchWords = async () => {
@@ -47,8 +58,10 @@ const word_dummy = [{
     knowStatus: true
 },]
 
-const WordList = ({ isSwiperVisible }) => {
+const WordList = () => {
     const [words, setWords] = useState();
+
+    const navigation = useNavigation();
 
     useEffect(() => {
         // Fetch words when the component mounts
@@ -106,6 +119,27 @@ const WordList = ({ isSwiperVisible }) => {
         </View>
     );
 
+    const [showSwiperButtons, setShowSwiperButtons] = useState(true);
+
+    // navigation 이벤트 리스너를 통해 현재 스크린 이름을 체크하고 버튼 표시 상태를 결정
+    // useEffect(() => {
+    
+    // const unsubscribe = navigation.addListener('state', (e) => {
+    //     // 현재 활성화된 스크린 이름 가져오기
+    //     const routeName = e.data.state?.routes[e.data.state.index]?.name;
+    //     console.log(routeName)
+
+    //     // QuizScreen 또는 ResultsScreen일 때 버튼 숨기기
+    //     if (routeName === 'Quiz' || routeName === 'Results') {
+    //     setShowSwiperButtons(false);
+    //     } else {
+    //     setShowSwiperButtons(true);
+    //     }
+    // });
+    // // 컴포넌트가 언마운트될 때 이벤트 리스너 제거
+    // return unsubscribe;
+    // }, [navigation]);
+
     return (
         <>
         <View style = {[styles.container, {backgroundColor : 'white'}]}>
@@ -118,9 +152,10 @@ const WordList = ({ isSwiperVisible }) => {
             </View>
             <View style={styles.seperatorOne} />
             <Swiper
-                showsButtons={false} 
+                // showsButtons={false} 
                 loop={false} 
-                showsPagination={isSwiperVisible} // Control pagination visibility
+                showsPagination={showSwiperButtons} // Control pagination visibility
+                scrollEnabled = {showSwiperButtons}
                 activeDotColor = '#FF4C00'
                 index={1}>
                 <View style={styles.slide}>
@@ -134,7 +169,7 @@ const WordList = ({ isSwiperVisible }) => {
                         keyExtractor={item => item.wordId.toString()}
                     />
                 </View>
-                <QuizNavigator />
+                <QuizNavigator setShowSwiperButtons={setShowSwiperButtons}/>
                 <VocabularyLearningScreen/>
             </Swiper>
         </View>
