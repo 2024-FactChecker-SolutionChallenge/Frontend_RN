@@ -3,11 +3,11 @@ import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions } from '
 
 const { width } = Dimensions.get('window');
 
-const vocabulary = [
-    { word: 'Word 1', meaning: 'Meaning 1' },
-    { word: 'Word 2', meaning: 'Meaning 2' },
-    // ... more words
-];
+// const vocabulary = [
+//     { id : 1, word: 'Word 1', mean: 'Mean 1' },
+//     { id : 2, word: 'Word 2', mean: 'Mean 2' },
+//     // ... more words
+// ];
 
 const FlipCard = ({ front, back, isFlipped, onPress }) => {
     const animatedValue = useRef(new Animated.Value(isFlipped ? 180 : 0)).current;
@@ -72,7 +72,43 @@ const FlipCard = ({ front, back, isFlipped, onPress }) => {
     );
 };
 
-const VocabularyLearningScreen = () => {
+const VocabularyLearningScreen = ({accessToken, refreshToken, currentSwipeIndex}) => {
+
+    const initial = [{ 
+        id : 1, 
+        word: "Check the words you don't know!"
+        , mean: "and memorize it with a flip-card" }
+    ]
+
+    const [ vocabulary, setVocabulary ] = useState(initial);
+
+    useEffect(() => {
+
+        const headers_config = {
+            "ACCESS_TOKEN": `Bearer ${accessToken}`,
+            "REFRESH_TOKEN": refreshToken
+        };
+
+        const fetchWords = async () => {
+            fetch('http://35.216.92.188:8080/api/study/flip-cards/word', {
+                method: 'GET',
+                headers: headers_config  // 헤더 추가
+            })
+            .then((response) => {
+                return response.json();
+            })
+            .then((json) => {
+                if (json && json.length > 0) { // 빈 배열이 아닌 경우에만 실행
+                    setVocabulary(json);
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+        };
+        fetchWords();
+    }, [currentSwipeIndex]);
+
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isFlipped, setIsFlipped] = useState(false);
 
@@ -87,7 +123,7 @@ const VocabularyLearningScreen = () => {
     };
 
     const word = vocabulary[currentIndex].word;
-    const meaning = vocabulary[currentIndex].meaning;
+    const mean = vocabulary[currentIndex].mean;
 
     return (
         <View style={styles.container}>
@@ -96,7 +132,7 @@ const VocabularyLearningScreen = () => {
             </TouchableOpacity>
             <FlipCard 
                 front={word} 
-                back={meaning} 
+                back={mean} 
                 isFlipped={isFlipped} 
                 onPress={() => setIsFlipped(!isFlipped)} 
             />
@@ -143,6 +179,7 @@ const styles = StyleSheet.create({
         color: 'black',
         position: 'absolute',
         color : '#594e48',
+        textAlign : 'center'
     },
     arrowButtonContainer: {
         width: 75,

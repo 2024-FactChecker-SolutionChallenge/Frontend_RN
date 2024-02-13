@@ -6,47 +6,69 @@ import { useFocusEffect } from '@react-navigation/native'
 // Dummy data for words
 const dummy_words = [
     {
-        wordId: 1,
-        word: "단어1",
+        id: 1,
+        quiz_word: "단어1",
         mean: "뜻1",
         knowStatus: false
     },
     {
-        wordId: 2,
-        word: "단어2",
+        id: 2,
+        quiz_word: "단어2",
         mean: "뜻2",
         knowStatus: false
     },
     {
-        wordId: 3,
-        word: "단어3",
+        id: 3,
+        quiz_word: "단어3",
         mean: "뜻3",
         knowStatus: false
     },
     {
-        wordId: 4,
-        word: "단어4",
+        id: 4,
+        quiz_word: "단어4",
         mean: "뜻4",
-        knowStatus: false
-    },
-    {
-        wordId: 5,
-        word: "단어5",
-        mean: "뜻5",
-        knowStatus: false
-    },
-    {
-        wordId: 6,
-        word: "단어6",
-        mean: "뜻6",
         knowStatus: false
     },
 ];
 
 // Home Screen component
-export function QuizHomeScreen({ navigation }) {
+export function QuizHomeScreen({ navigation, accessToken, refreshToken }) {
 
     const [quizTaken, setQuizTaken] = useState(false);
+    const [loading, setLoading] = useState('START');
+
+    const fetchWords = async () => {
+
+        setLoading('Loading Words...');
+
+        try {
+            const response = await fetch('http://35.216.92.188:8080/api/study/daily-quiz/word', {
+                method: 'GET',
+                headers: {
+                    "ACCESS_TOKEN": `Bearer ${accessToken}`,
+                    "REFRESH_TOKEN": refreshToken
+                }
+            });
+
+            const json = await response.json();
+            
+            if (response.ok) {
+                console.log("Homescreen")
+                console.log(json);
+                navigation.navigate('Quiz', { fetchedWords: json });; // 여기에서 Quiz 스크린으로 네비게이션
+
+            } else {
+                // 에러 처리
+                console.error('Error fetching words');
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading('START');
+        }
+    };
+    
+
 
     return (
         <View style={[styles.container, { backgroundColor: 'white' }]}>
@@ -62,7 +84,6 @@ export function QuizHomeScreen({ navigation }) {
             {quizTaken? 
             <>
                 <TouchableOpacity
-                    onPress={() => navigation.navigate('Quiz')}
                     disabled={quizTaken}
                     style={styles.bannedQuiz}
                     >
@@ -78,7 +99,7 @@ export function QuizHomeScreen({ navigation }) {
             </>
             :  
             <TouchableOpacity
-                onPress={() => navigation.navigate('Quiz')}
+                onPress={fetchWords}
                 disabled={quizTaken}
                 style={styles.startQuiz}
                 >
@@ -87,7 +108,7 @@ export function QuizHomeScreen({ navigation }) {
                     style={styles.buttonImage}
                     imageStyle={{ borderRadius: 150 }}
                 >
-                    <Text style={styles.startQuizbuttonText}>START</Text>
+                    <Text style={styles.startQuizbuttonText}>{loading}</Text>
                     <Text style={styles.chanceLeftText}>Chances left : 1</Text>
                 </ImageBackground>
             </TouchableOpacity>
@@ -100,12 +121,24 @@ export function QuizHomeScreen({ navigation }) {
 
 // Quiz Screen component
 // Quiz Screen component
-export function QuizScreen({ navigation, setShowSwiperButtons }) {
+export function QuizScreen({ route, navigation, setShowSwiperButtons }) {
+
+    const { fetchedWords } = route.params;
+
+    // console.log("QuizScreen");
+    // console.log(fetchedWords);
+
+    const [ quizWords, setQuizWords ] = useState([])
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [remainingTime, setRemainingTime] = useState(5); // 5 seconds countdown
     const [userAnswers, setUserAnswers] = useState([]);
-    const [words, setWords] = useState(dummy_words); 
+    // const [words, setWords] = useState(dummy_words); 
     const [options, setOptions] = useState([])
+
+
+    useEffect(()=>{
+        setQuizWords(fetchedWords);
+    },[])
 
     useFocusEffect(
         React.useCallback(() => {
@@ -119,17 +152,17 @@ export function QuizScreen({ navigation, setShowSwiperButtons }) {
     );
 
     // 현재 질문의 단어 가져오기
-    const currentWord = currentQuestionIndex < dummy_words.length 
-        ? dummy_words[currentQuestionIndex] 
+    const currentWord = currentQuestionIndex < quizWords.length 
+        ? quizWords[currentQuestionIndex] 
         : null;
 
     // 랜덤으로 뜻 선택하는 함수
     const getRandomMeans = () => {
-        if (!currentWord) {
+        if (!currentWord || quizWords.length === 0) {
             return [];
         }
     
-        let means = dummy_words.map(word => word.mean);
+        let means = quizWords.map(word => word.mean);
         means = means.filter(mean => mean !== currentWord.mean);
         means.sort(() => 0.5 - Math.random());
         const selectedMeans = means.slice(0, 3);
@@ -142,14 +175,14 @@ export function QuizScreen({ navigation, setShowSwiperButtons }) {
     // 답변 처리
     const handleAnswer = (answer) => {
         const isCorrect = answer === currentWord.mean;
-        const updatedWords = words.map(word =>
-            word.wordId === currentWord.wordId ? { ...word, knowStatus: isCorrect } : word
+        const updatedWords = quizWords.map(word =>
+            word.id === currentWord.id ? { ...word, knowStatus: isCorrect } : word
         );
-        setWords(updatedWords);
-        setUserAnswers([...userAnswers, { wordId: currentWord.wordId, isCorrect }]);
+        setQuizWords(updatedWords);
+        setUserAnswers([...userAnswers, { id: currentWord.id, isCorrect }]);
 
         // 다음 질문으로
-        if (currentQuestionIndex < dummy_words.length - 1) {
+        if (currentQuestionIndex < quizWords.length - 1) {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
             setRemainingTime(5);
         } else {
@@ -158,7 +191,7 @@ export function QuizScreen({ navigation, setShowSwiperButtons }) {
     };
 
     // 남은 문제 수 계산하는 함수
-    const remainingQuestions = dummy_words.length - currentQuestionIndex;
+    const remainingQuestions = quizWords.length - currentQuestionIndex;
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -167,23 +200,27 @@ export function QuizScreen({ navigation, setShowSwiperButtons }) {
 
         // 시간이 다 되면 다음 질문으로 이동 또는 결과 화면으로
         if (remainingTime === 0) {
-            if (currentQuestionIndex < dummy_words.length - 1) {
+            if (currentQuestionIndex < quizWords.length - 1) {
                 setCurrentQuestionIndex(currentQuestionIndex + 1);
                 setRemainingTime(5); // 타이머 재설정
             } else {
-                navigation.navigate('Results', { words: words });
+                navigation.navigate('Results', { quizWords: quizWords });
             }
         }
         return () => clearInterval(timer);
     }, [remainingTime, currentQuestionIndex, navigation]);
 
     useEffect(() => {
+        setQuizWords(fetchedWords);
+    }, [fetchedWords]);
+    
+    useEffect(() => {
         // 현재 질문 인덱스가 변경될 때마다 선택지 업데이트
         setOptions(getRandomMeans());
-    }, [currentQuestionIndex]);
+    }, [currentQuestionIndex, quizWords]); // quizWords 의존성 추가
 
 
-    if (!currentWord) {
+    if (!currentWord || quizWords.length === 0) {
         return <View style={styles.container}><Text>Loading...</Text></View>;
     }
 
@@ -192,7 +229,7 @@ export function QuizScreen({ navigation, setShowSwiperButtons }) {
             <Text style = {styles.remainingTime}>Time left: {remainingTime}</Text>
             <Text style = {styles.remainingTime}>Questions left: {remainingQuestions}</Text>
             <View style={styles.wordContainer}>
-                <Text style={styles.wordText}>{currentWord.word}</Text>
+                <Text style={styles.wordText}>{currentWord.quiz_word}</Text>
             </View>
             {options.map((option, index) => (
                 <TouchableOpacity
@@ -210,41 +247,79 @@ export function QuizScreen({ navigation, setShowSwiperButtons }) {
 
 
 // Results Screen component
-export function ResultsScreen({ route, navigation}) {
+export function ResultsScreen({ route, navigation, accessToken, refreshToken}) {
     const [words, setWords] = useState(null);
-    const [totalScore, setTotalScore] = useState(0);
-    
+    const [totalScore, setTotalScore] = useState(null);
 
-    // useFocusEffect(
-    //     React.useCallback(() => {
-    //         console.log('ResultsScreen is focused, setting ShowSwiperButtons to false');
-    //         setShowSwiperButtons(false);
+    const getDayOfWeek = () => {
+        // JavaScript의 Date 객체를 사용하여 현재 날짜를 가져옵니다.
+        const today = new Date();
+        
+        // 요일을 나타내는 숫자를 가져옵니다. (0: 일요일, 1: 월요일, ..., 6: 토요일)
+        const dayOfWeek = today.getDay();
     
-    //         return () => {
-    //             console.log('ResultsScreen is losing focus, setting ShowSwiperButtons to true');
-    //             setShowSwiperButtons(true);
-    //         };
-    //     }, [route.params])
-    // );
-    
+        // 한국 기준의 요일 이름을 반환합니다.
+        const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+        return dayNames[dayOfWeek];
+    };
 
     useEffect(() => {
-        if (route.params?.words) {
-            setWords(route.params.words);
+
+        const day = getDayOfWeek();
+
+        const fetchData = async () => {
+            try {
+                const response = await fetch('http://35.216.92.188:8080/api/study/daily-quiz/score', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        "ACCESS_TOKEN": `Bearer ${accessToken}`,
+                        "REFRESH_TOKEN": refreshToken
+                    },
+                    body: JSON.stringify({
+                        "day" : day,
+                        "score" : totalScore
+                    })
+                });
+                
+                const json = await response.json();
+    
+                if (response.ok) {
+                    console.log(json);
+                } else {
+                    console.error('Error fetching words');
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        };
+    
+        if (totalScore != null) {
+            console.log(totalScore)
+            fetchData();
         }
-    }, [route.params]);
-    
+    }, [totalScore, accessToken, refreshToken]);
 
     useEffect(() => {
-        if (words) {
-            const calculatedScore = calculateTotalScore(words);
+        if (route.params?.quizWords) {
+            const quizWords = route.params.quizWords;
+            setWords(quizWords);
+            const calculatedScore = calculateTotalScore(quizWords);
             setTotalScore(calculatedScore);
         }
-    }, [words]);
+    }, [route.params]);
 
-    const toggleMeanVisibility = (wordId) => {
+
+    // useEffect(() => {
+    //     if (words) {
+    //         const calculatedScore = calculateTotalScore(words);
+    //         setTotalScore(calculatedScore);
+    //     }
+    // }, [words]);
+
+    const toggleMeanVisibility = (id) => {
         const updatedWords = words.map(word => {
-            if (word.wordId === wordId) {
+            if (word.id === id) {
                 return { ...word, showMean: !word.showMean };
             }
             return word;
@@ -260,8 +335,8 @@ export function ResultsScreen({ route, navigation}) {
         <View style={{ flex : 1, backgroundColor: 'white' }}>
             <View style={styles.resultWordContainer}>
                     <View style={styles.resultRowContainer}>
-                        <TouchableOpacity onPress={() => toggleMeanVisibility(item.wordId)}>
-                            <Text style={styles.resultWord}>{item.word}</Text>
+                        <TouchableOpacity onPress={() => toggleMeanVisibility(item.id)}>
+                            <Text style={styles.resultWord}>{item.quiz_word}</Text>
                         </TouchableOpacity>
                         <Text style={item.knowStatus ? styles.checkMark : styles.crossMark}>
                             {item.knowStatus ? '✔' : '❌'}
@@ -285,7 +360,7 @@ export function ResultsScreen({ route, navigation}) {
             <FlatList
                 data={words}
                 renderItem={renderItem}
-                keyExtractor={item => item.wordId.toString()}
+                keyExtractor={item => item.id.toString()}
             />
             <View style={styles.restartContainer}>
             <TouchableOpacity

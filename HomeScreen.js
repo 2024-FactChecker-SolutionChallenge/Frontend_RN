@@ -3,7 +3,9 @@ import { View, ScrollView, TouchableOpacity, Text, FlatList, StyleSheet, Image }
 import { useNavigation } from '@react-navigation/native'
 import {LinearGradient} from 'expo-linear-gradient';
 
-const HomeScreen = () => {
+const HomeScreen = ({route}) => {
+    const { accessToken, refreshToken } = route.params;
+
     const navigation = useNavigation();
     const [selectedSection, setSelectedSection] = useState(null);
     

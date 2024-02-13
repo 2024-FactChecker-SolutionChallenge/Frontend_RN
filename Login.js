@@ -1,14 +1,54 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const LoginScreen = () => {
+
+const LoginScreen = ({setIsAuthenticated, setAccessToken, setRefreshToken}) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigation = useNavigation();
 
     const handleLogin = () => {
-        // 로그인 처리 로직
+        fetch('http://35.216.92.188:8080/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                id: email.trim(),
+                password: password.trim(),
+            }),
+        })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Login failed'); // 로그인 실패 처리
+            }
+
+            // 토큰 추출
+            const accessToken = response.headers.get('access_token');
+            const refreshToken = response.headers.get('refresh_token');
+
+            if (accessToken && refreshToken) {
+                // 토큰 저장
+                AsyncStorage.setItem('accessToken', accessToken);
+                AsyncStorage.setItem('refreshToken', refreshToken);
+                setAccessToken(accessToken)
+                setRefreshToken(refreshToken)
+
+                // 인증 상태 업데이트
+                setIsAuthenticated(true);
+            }
+
+            return response.json();
+        })
+        .then((json) => {
+            console.log(json);
+        })
+        .catch((error) => {
+            console.error(error);
+            // 에러 처리 로직
+        });
     };
 
     const navigateToSignup = () => {

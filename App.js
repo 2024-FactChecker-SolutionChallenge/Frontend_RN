@@ -13,13 +13,16 @@ import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import MyPage from './MyPage';
 import LoginScreen from './Login';
 import SignupScreen from './Singup';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 function App() {
 
-    const [isAuthenticated, setIsAuthenticated] = useState(true);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [accessToken, setAccessToken] = useState(null);
+    const [refreshToken, setRefreshToken] = useState(null);
 
     // 인증 상태를 체크하는 함수 (예시로만 작성됨, 실제 구현 필요)
     useEffect(() => {
@@ -70,21 +73,36 @@ function App() {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeStack} options={{ headerShown: false }}/>
-      <Tab.Screen name="FactCheck" component={FactCheckStack} options={{ headerShown: false }}/>
+      <Tab.Screen 
+        name="Home" 
+        component={HomeStack} 
+        options={{ headerShown: false }} 
+        initialParams={{ accessToken, refreshToken }} />
+      <Tab.Screen 
+        name="FactCheck" 
+        component={FactCheckStack} 
+        options={{ headerShown: false }} 
+        initialParams={{ accessToken, refreshToken }} />
       <Tab.Screen 
           name="Word" 
-          children={() => <WordList/>} 
+          component = {WordList}
           options={{ headerShown: false }}
+          initialParams={{ accessToken, refreshToken }} 
         />
-      <Tab.Screen name="MyPage" component={MyPage} options={{ headerShown: false }}/>
+      <Tab.Screen 
+        name="MyPage" 
+        component={MyPage} 
+        options={{ headerShown: false }} 
+        initialParams={{ accessToken, refreshToken }} />
     </Tab.Navigator>
     );
 
     // 인증 화면을 위한 스택 네비게이터
     const AuthStackNavigator = () => (
       <Stack.Navigator>
-        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Login" options={{ headerShown: false }}>
+          {props => <LoginScreen {...props} setIsAuthenticated={setIsAuthenticated} setAccessToken = {setAccessToken} setRefreshToken={setRefreshToken}/>}
+        </Stack.Screen>
         <Stack.Screen 
         name="Signup" 
         component={SignupScreen} 
@@ -102,14 +120,21 @@ function App() {
 
     return (
       <SafeAreaView style={styles.container}>
-        <NavigationContainer>
-          {isAuthenticated ? <MainTabNavigator /> : <AuthStackNavigator />}
-        </NavigationContainer>
-      </SafeAreaView>
+      <NavigationContainer>
+        {isAuthenticated ? (
+          <MainTabNavigator accessToken={accessToken} refreshToken={refreshToken} />
+        ) : (
+          <AuthStackNavigator />
+        )}
+      </NavigationContainer>
+    </SafeAreaView>
     );
 }
 
 function HomeStack({ navigation, route }) {
+
+  const { accessToken, refreshToken } = route.params;
+
   React.useLayoutEffect(() => {
     const routeName = getFocusedRouteNameFromRoute(route) ?? 'Home';
     if (routeName === 'Check words & Summarize') {
@@ -130,13 +155,21 @@ function HomeStack({ navigation, route }) {
 
   return (
     <Stack.Navigator>
-      <Stack.Screen name="홈화면" component={HomeScreen} options={{ headerShown: false}} />
-      <Stack.Screen name="Check words & Summarize" component={LearnScreen} options={{
-        headerShown: true,
-        tabBarStyle: { display: 'none' }, // 이 줄을 추가
-        headerStyle: {
-          backgroundColor: '#EB5929', // 헤더의 배경색
-          justifyContent : 'center'
+      <Stack.Screen 
+        name="홈화면" 
+        component={HomeScreen} 
+        options={{ headerShown: false}} 
+        initialParams={{ accessToken, refreshToken }}/>
+      <Stack.Screen 
+        name="Check words & Summarize" 
+        component={LearnScreen} 
+        initialParams={{ accessToken, refreshToken }}
+        options={{
+          headerShown: true,
+          tabBarStyle: { display: 'none' }, // 이 줄을 추가
+          headerStyle: {
+            backgroundColor: '#EB5929', // 헤더의 배경색
+            justifyContent : 'center'
         },
         headerTitleStyle: {
           color: 'white', // 제목의 색상
@@ -147,6 +180,9 @@ function HomeStack({ navigation, route }) {
 }
 
 function FactCheckStack({ navigation, route }) {
+
+  const { accessToken, refreshToken } = route.params;
+
   React.useLayoutEffect(() => {
     const routeName = getFocusedRouteNameFromRoute(route) ?? 'Home';
     if (routeName === 'Check words & Summarize') {
@@ -167,8 +203,16 @@ function FactCheckStack({ navigation, route }) {
 
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Factcheck" component={FactCheck} options={{ headerShown: false}} />
-      <Stack.Screen name="Check words & Summarize" component={LearnScreen} options={{
+      <Stack.Screen 
+        name="Factcheck" 
+        component={FactCheck} 
+        options={{ headerShown: false}} 
+        initialParams={{ accessToken, refreshToken }}/>
+      <Stack.Screen 
+        name="Check words & Summarize" 
+        component={LearnScreen}
+        initialParams={{ accessToken, refreshToken }} 
+        options={{
         headerShown: true,
         tabBarStyle: { display: 'none' }, // 이 줄을 추가
         headerStyle: {

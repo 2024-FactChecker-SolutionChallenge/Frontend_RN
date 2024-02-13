@@ -1,59 +1,60 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Switch, FlatList } from 'react-native';
+import { useNavigation } from '@react-navigation/native'
 
 const SignupScreen = () => {
 
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    // 추가적인 상태 변수들 (예: 약관 동의 등)
-    // ... 이전 상태 변수들
-
-    const [isAgree, setIsAgree] = useState(false);
-
-    // 스위치 상태를 변경하는 함수입니다.
-    const toggleSwitch = () => setIsAgree(previousState => !previousState);
-
-    const handleSignup = () => {
-        // E-mail, Nickname, P/W, 약관 동의 여부 등의 유효성을 검사합니다.
-        if (!email || !username || !password) {
-            alert('E-mail, Nickname, P/W를 모두 입력해주세요.');
-            return;
-        }
-        
-        // if (!isAgree) {
-        //     alert('약관에 동의해주세요.');
-        //     return;
-        // }
-    
-        // 회원가입 로직을 수행합니다.
-        // 예: 서버에 회원가입 요청을 보냅니다.
-        // fetch 또는 axios를 사용하여 서버에 요청을 보낼 수 있습니다.
-        // 예: fetch('https://api.example.com/signup', {
-        //            method: 'POST',
-        //            body: JSON.stringify({ email, username, password }),
-        //            headers: {
-        //                'Content-Type': 'application/json'
-        //            }
-        //        })
-        //        .then(response => response.json())
-        //        .then(data => {
-        //            console.log(data);
-        //            // 회원가입 성공 또는 실패에 따라 적절한 처리를 수행합니다.
-        //        })
-        //        .catch(error => {
-        //            console.error('Error:', error);
-        //        });
-    };
-
     const [passwordConfirm, setPasswordConfirm] = useState('');
+    const [getCode, setGetCode] = useState('');
+    const [checkCode, setCheckCode] = useState('');
+    const [codeEqual, setCodeEqual] = useState(null);
+    const [pwEqual, setPwEqual] =  useState(null);
+
+    const sendEmail = () => {
+        fetch('http://35.216.92.188:8080/api/auth/confirm', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            email: email.trim(),
+        }),
+        })
+        .then((response) => response.json())
+        .then((response) => setGetCode(response.AuthenticationCode))
+        .then((json) => console.log(json))
+        .catch((error) => console.error(error));
+    }
+
+    console.log(getCode)
+
+    const verifyCode = (inputCode) => {
+        if (inputCode === getCode.trim()) {
+            setCodeEqual(true);
+        } else {
+            setCodeEqual(false);
+        }
+    }  
+
+    const verifyPw = (inputPw) => {
+        console.log(password, passwordConfirm)
+        if (inputPw === password.trim()) {
+            setPwEqual(true);
+        } else {
+            setPwEqual(false);
+        }
+    } 
+
     const [selectedLearningLevel, setSelectedLearningLevel] = useState(null);
     const [selectedInterests, setSelectedInterests] = useState([]);
 
     const learningLevels = ['Beginner', 'Intermediate', 'Advanced'];
-    const interests1 = ['Politics', 'Economy', 'Society'];
-    const interests2 = ['Culture', 'World', 'IT/Science'];
-
+    const interests1 = ['POLITICS', 'ECONOMY', 'SOCIETY'];
+    const interests2 = ['GLOBAL', 'IT/SCIENCE', 'CULTURE'];
+    
     const handleSelectLearningLevel = (level) => {
     setSelectedLearningLevel(level);
     };
@@ -66,6 +67,69 @@ const SignupScreen = () => {
         return [...prevInterests, interest];
         }
     });
+    };
+
+    // console.log(selectedLearningLevel)
+    // console.log(selectedInterests)
+
+    const interestsJson = {
+        "1" : "POLITICS",
+        "2" : "ECONOMY",
+        "3" : "SOCIETY",
+        "4" : "GLOBAL",
+        "5" : "IT/SCIENCE",
+        "6" : "CULTURE"
+    }
+
+    const navigation = useNavigation();
+
+    const handleSignup = () => {
+        // E-mail, Nickname, P/W, 약관 동의 여부 등의 유효성을 검사합니다.
+        if (!email || !username || !password) {
+            alert('Enter all the fields.');
+            return;
+        } else {
+            if (!codeEqual || !pwEqual) {
+                alert("The input isn't valid");
+            } else {
+                // interestsJson 객체의 값들을 배열로 가져옴
+                const filteredDictionary = {};
+
+                Object.entries(interestsJson).forEach(([key, value]) => {
+                    if (selectedInterests.includes(value)) {
+                        filteredDictionary[key] = value;
+                    }
+                });
+
+                fetch('http://35.216.92.188:8080/api/auth/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        id: email.trim(),
+                        password: password.trim(),
+                        nickname: username.trim(),
+                        grade: selectedLearningLevel.trim(),
+                        interests: filteredDictionary
+                    }),
+                })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('Login failed'); // 로그인 실패 처리
+                    }
+                    return response.json();
+                })
+                .then((json) => {
+                    console.log(json);
+                    navigation.navigate('Login'); // 이 부분을 성공 로직에 맞게 조정
+                })
+                .catch((error) => {
+                    console.error(error);
+                    // 에러 처리 로직
+                });
+            }
+        }
     };
 
     // Render function for the interests FlatList
@@ -88,7 +152,7 @@ const SignupScreen = () => {
                     </Text>
             </TouchableOpacity>
     </View>
-    );
+    );  
     
 
 return (
@@ -101,7 +165,10 @@ return (
                 <View style={styles.label}>
                     <Text style={[styles.labelText]}>E-mail</Text>    
                 </View>
-                <View style={styles.label}>
+                <View style={[styles.label]}>
+                        <Text style={[styles.labelText]}>Verify</Text>
+                </View>
+                <View style={[styles.label, style={marginTop:"50%"}]}>
                     <Text style={[styles.labelText]}>P/W</Text>    
                 </View>
                 <View style={styles.label}>
@@ -115,12 +182,32 @@ return (
                     onChangeText={setUsername}
                     style={styles.input}
                 />
+                <View style={styles.rowContainer}>
+                    <TextInput
+                        placeholder="E-mail"
+                        value={email}
+                        onChangeText={setEmail}
+                        style={styles.emailInput}
+                    />
+                    <TouchableOpacity style={styles.authButton}>
+                        <Text style = {styles.authText} onPress = {sendEmail}>Get code</Text>
+                    </TouchableOpacity>
+                </View>
                 <TextInput
-                    placeholder="E-mail"
-                    value={email}
-                    onChangeText={setEmail}
+                    placeholder="Enter the verification code"
+                    value={checkCode}
+                    onChangeText={text => {
+                        setCheckCode(text);
+                        verifyCode(text);
+                    }}
                     style={styles.input}
                 />
+                {codeEqual == null ?
+                    <Text></Text>
+                : codeEqual ?
+                    <Text style={{fontSize : 14, left: "3%", color : 'blue'}}>Valid</Text>
+                    : 
+                    <Text style={{fontSize : 14, left: "3%", color : 'red'}}>Invalid</Text>}
                 <TextInput
                     placeholder="P/W"
                     value={password}
@@ -131,10 +218,19 @@ return (
                 <TextInput
                     placeholder="P/W 확인"
                     value={passwordConfirm}
-                    onChangeText={setPasswordConfirm}
+                    onChangeText={text => {
+                        setPasswordConfirm(text);
+                        verifyPw(text);
+                    }}
                     secureTextEntry
                     style={styles.input}
                 />
+                {pwEqual == null ? 
+                    ''
+                : pwEqual ?
+                    <Text style={{fontSize : 14, left: "3%", color : 'blue'}}>Valid</Text>
+                    : 
+                    <Text style={{fontSize : 14, left: "3%", color : 'red'}}>Invalid</Text>}
             </View>
         </View>
     <Text style = {styles.textGoal}>Weekly Goals</Text>
@@ -227,7 +323,7 @@ const styles = StyleSheet.create({
         fontSize : 12
     }, 
     input: {
-        width: '95%',
+        width: '90%',
         justifyContent : 'center',
         alignItems : 'center',
         height: 40,
@@ -236,19 +332,59 @@ const styles = StyleSheet.create({
         marginVertical: "5%",
         left : "3%"
     },
+    rowContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        paddingHorizontal: "3%",
+        position : 'relative'
+    },
+    emailInput: {
+        width: '70%', // 이메일 입력란의 너비
+        height: 40,
+        borderBottomWidth: 1,
+        borderColor: '#55433B',
+        marginRight: 10, // 버튼과의 간격
+        marginVertical: "5%",
+    },
+    authInput: {
+        width: '70%', // 이메일 입력란의 너비
+        height: 40,
+        borderBottomWidth: 1,
+        borderColor: '#55433B',
+        marginRight: 10, // 버튼과의 간격
+    },
+    authButton: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor :'#55433B',
+        maxWidth : "100%",
+        position : 'absolute',
+        right : "5%",
+        bottom : "10%",
+        padding : 10,
+        borderRadius : 20,
+        marginBottom : 15,
+        // 여기에 추가 버튼 스타일을 정의할 수 있어
+    }, 
+    authText : {
+        color : 'white'
+    }, 
     textGoal : {
         color : '#55433B',
         fontSize : 20,
         fontWeight : '500',
         textAlign : 'center',
-        marginTop : 20,
+        marginTop : 110,
     },
     textInterest : {
         color : '#55433B',
         fontSize : 20,
         fontWeight : '500',
         textAlign : 'center',
-        marginTop : 20,
+        marginTop : 5,
+        marginBottom :3,
     },
     radioGroup: {
         flexDirection: 'row',
@@ -298,6 +434,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         maxHeight : 110,
+
     },
     interestBox: {
         flexGrow: 0,
@@ -334,7 +471,9 @@ const styles = StyleSheet.create({
         justifyContent : 'center',
         maxWidth : "50%",
         marginHorizontal : "25%",
-        marginVertical : '10%'
+        marginVertical : '10%',
+        marginTop : "5%",
+        marginBottom : '5%'
     },
     buttonText: {
         color: 'white',
