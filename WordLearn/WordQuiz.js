@@ -9,9 +9,7 @@ import {
   ImageBackground,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-// import Ionicons from 'react-native-vector-icons/Ionicons';
 
-// Dummy data for words
 const dummy_words = [
   {
     id: 1,
@@ -39,7 +37,6 @@ const dummy_words = [
   },
 ];
 
-// Home Screen component
 export function QuizHomeScreen({ navigation, accessToken, refreshToken }) {
   const [quizTaken, setQuizTaken] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -150,19 +147,13 @@ export function QuizHomeScreen({ navigation, accessToken, refreshToken }) {
   );
 }
 
-// Quiz Screen component
-// Quiz Screen component
 export function QuizScreen({ route, navigation, setShowSwiperButtons }) {
   const { fetchedWords } = route.params;
 
-  // console.log("QuizScreen");
-  // console.log(fetchedWords);
-
   const [quizWords, setQuizWords] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [remainingTime, setRemainingTime] = useState(8); // 5 seconds countdown
+  const [remainingTime, setRemainingTime] = useState(8);
   const [userAnswers, setUserAnswers] = useState([]);
-  // const [words, setWords] = useState(dummy_words);
   const [options, setOptions] = useState([]);
 
   useEffect(() => {
@@ -171,22 +162,18 @@ export function QuizScreen({ route, navigation, setShowSwiperButtons }) {
 
   useFocusEffect(
     React.useCallback(() => {
-      // QuizScreen이 포커스 될 때
       setShowSwiperButtons(false);
       return () => {
-        // QuizScreen이 포커스를 잃을 때
         setShowSwiperButtons(true);
       };
     }, [])
   );
 
-  // 현재 질문의 단어 가져오기
   const currentWord =
     currentQuestionIndex < quizWords.length
       ? quizWords[currentQuestionIndex]
       : null;
 
-  // 랜덤으로 뜻 선택하는 함수
   const getRandomMeans = () => {
     if (!currentWord || quizWords.length === 0) {
       return [];
@@ -196,13 +183,12 @@ export function QuizScreen({ route, navigation, setShowSwiperButtons }) {
     means = means.filter((mean) => mean !== currentWord.mean);
     means.sort(() => 0.5 - Math.random());
     const selectedMeans = means.slice(0, 3);
-    selectedMeans.push(currentWord.mean); // 현재 단어의 뜻 추가
-    selectedMeans.sort(() => 0.5 - Math.random()); // 전체 선택지 랜덤하게 섞기
+    selectedMeans.push(currentWord.mean);
+    selectedMeans.sort(() => 0.5 - Math.random());
 
     return selectedMeans;
   };
 
-  // 답변 처리
   const handleAnswer = (answer) => {
     const isCorrect = answer === currentWord.mean;
     const updatedWords = quizWords.map((word) =>
@@ -211,7 +197,6 @@ export function QuizScreen({ route, navigation, setShowSwiperButtons }) {
     setQuizWords(updatedWords);
     setUserAnswers([...userAnswers, { id: currentWord.id, isCorrect }]);
 
-    // 다음 질문으로
     if (currentQuestionIndex < quizWords.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setRemainingTime(8);
@@ -220,7 +205,6 @@ export function QuizScreen({ route, navigation, setShowSwiperButtons }) {
     }
   };
 
-  // 남은 문제 수 계산하는 함수
   const remainingQuestions = quizWords.length - currentQuestionIndex;
 
   useEffect(() => {
@@ -228,11 +212,10 @@ export function QuizScreen({ route, navigation, setShowSwiperButtons }) {
       setRemainingTime((remainingTime) => remainingTime - 1);
     }, 1000);
 
-    // 시간이 다 되면 다음 질문으로 이동 또는 결과 화면으로
     if (remainingTime === 0) {
       if (currentQuestionIndex < quizWords.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
-        setRemainingTime(8); // 타이머 재설정
+        setRemainingTime(8);
       } else {
         navigation.navigate("Results", { quizWords: quizWords });
       }
@@ -245,9 +228,8 @@ export function QuizScreen({ route, navigation, setShowSwiperButtons }) {
   }, [fetchedWords]);
 
   useEffect(() => {
-    // 현재 질문 인덱스가 변경될 때마다 선택지 업데이트
     setOptions(getRandomMeans());
-  }, [currentQuestionIndex, quizWords]); // quizWords 의존성 추가
+  }, [currentQuestionIndex, quizWords]);
 
   if (!currentWord || quizWords.length === 0) {
     return (
@@ -291,13 +273,10 @@ export function ResultsScreen({
   const [totalScore, setTotalScore] = useState(null);
 
   const getDayOfWeek = () => {
-    // JavaScript의 Date 객체를 사용하여 현재 날짜를 가져옵니다.
     const today = new Date();
 
-    // 요일을 나타내는 숫자를 가져옵니다. (0: 일요일, 1: 월요일, ..., 6: 토요일)
     const dayOfWeek = today.getDay();
 
-    // 한국 기준의 요일 이름을 반환합니다.
     const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
     return dayNames[dayOfWeek];
   };
@@ -355,14 +334,6 @@ export function ResultsScreen({
   }, [route.params]);
 
   console.log(words);
-
-  // useEffect(() => {
-  //     if (words) {
-  //         const calculatedScore = calculateTotalScore(words);
-  //         setTotalScore(calculatedScore);
-  //     }
-  // }, [words]);
-
   const toggleMeanVisibility = (id) => {
     const updatedWords = words.map((word) => {
       if (word.id === id) {
@@ -401,7 +372,6 @@ export function ResultsScreen({
         }
       );
 
-      // console.log(response);
       const json = await response.json();
 
       if (response.ok) {
@@ -476,9 +446,9 @@ const styles = StyleSheet.create({
   startQuiz: {
     backgroundColor: "#ff7e54",
     padding: 10,
-    borderRadius: 150, // 수정된 부분: 원형 버튼을 위해
+    borderRadius: 150,
     alignItems: "center",
-    justifyContent: "center", // 추가된 부분: 세로 중앙 정렬을 위해
+    justifyContent: "center",
     margin: 10,
     width: 200,
     height: 200,
@@ -500,9 +470,9 @@ const styles = StyleSheet.create({
   bannedQuiz: {
     backgroundColor: "#ff7e54",
     padding: 10,
-    borderRadius: 150, // 수정된 부분: 원형 버튼을 위해
+    borderRadius: 150,
     alignItems: "center",
-    justifyContent: "center", // 추가된 부분: 세로 중앙 정렬을 위해
+    justifyContent: "center",
     margin: 10,
     width: 200,
     height: 200,
@@ -521,18 +491,17 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   buttonImage: {
-    // 이미지가 차지할 영역에 대한 스타일
-    width: "100%", // 버튼의 너비와 같게
-    height: "100%", // 버튼의 높이와 같게
-    resizeMode: "cover", // 이미지가 영역을 꽉 채우도록
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
   },
   disabledButton: {
-    backgroundColor: "#ffc2ad", // 비활성화 상태일 때의 배경 색상
+    backgroundColor: "#ffc2ad",
     padding: 10,
     borderRadius: 5,
-    borderRadius: 150, // 수정된 부분: 원형 버튼을 위해
+    borderRadius: 150,
     alignItems: "center",
-    justifyContent: "center", // 추가된 부분: 세로 중앙 정렬을 위해
+    justifyContent: "center",
     margin: 10,
     width: 200,
     height: 200,
@@ -554,8 +523,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     fontSize: 18,
   },
-
-  /// Quiz
   remainingTime: {
     fontSize: 20,
     color: "#55433B",
@@ -564,17 +531,17 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#ff7e54",
-    padding: 10, // 버튼 안의 여백(padding)을 조정해줘
-    margin: 8, // 버튼 간의 간격(margin)을 조정해줘
-    borderRadius: 5, // 버튼의 테두리를 둥글게 만들어줘
+    padding: 10,
+    margin: 8,
+    borderRadius: 5,
     minWidth: "80%",
     maxWidth: "80%",
     marginTop: 10,
   },
   buttonText: {
-    color: "white", // 버튼 텍스트의 색상을 흰색으로 설정해줘
-    fontSize: 15, // 버튼 텍스트의 크기를 조정해줘
-    textAlign: "center", // 버튼 텍스트를 가운데 정렬해줘
+    color: "white",
+    fontSize: 15,
+    textAlign: "center",
   },
   marginQuizBox: {
     height: "7%",
@@ -588,7 +555,7 @@ const styles = StyleSheet.create({
     height: "30%",
     alignItems: "center",
     justifyContent: "center",
-    elevation: 5, // 이런 식으로 elevation을 추가해서 그림자 효과를 줄 수 있어
+    elevation: 5,
   },
   wordText: {
     fontSize: 20,
@@ -599,8 +566,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-
-  ///// result
   resultWordContainer: {
     paddingVertical: 10,
     paddingHorizontal: 20,

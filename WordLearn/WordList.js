@@ -109,7 +109,6 @@ const WordList = ({ route }) => {
       }
 
       const json = await response.json();
-      // console.log("fetch words", json);
       setWords(json);
     } catch (error) {
       console.error("Error fetching words", error);
@@ -120,7 +119,6 @@ const WordList = ({ route }) => {
     fetchWords();
   }, [currentSwipeIndex]);
 
-  // Function to send PATCH request to update the word status
   const updateWordStatus = async (wordId, currentStatus) => {
     try {
       const response = await fetch(
@@ -154,10 +152,8 @@ const WordList = ({ route }) => {
   };
 
   const handleToggleWordStatus = (wordId, currentStatus) => {
-    // Update the status in the server
     updateWordStatus(wordId, currentStatus)
       .then(() => {
-        // Update the status in the local state
         setWords(
           words.map((word) => {
             if (word.id === wordId) {
@@ -209,7 +205,7 @@ const WordList = ({ route }) => {
     </View>
   );
 
-  const [currentSwipeIndex, setCurrentSwipeIndex] = useState(null); // Swiper의 현재 인덱스를 추적하는 상태
+  const [currentSwipeIndex, setCurrentSwipeIndex] = useState(null);
   const [showSwiperButtons, setShowSwiperButtons] = useState(true);
 
   return (
@@ -218,14 +214,14 @@ const WordList = ({ route }) => {
         <View style={styles.logoContainer}>
           <Image
             style={styles.image}
-            source={require("../assets/img/truetree_logo.png")} // 이미지 파일 경로 지정
+            source={require("../assets/img/truetree_logo.png")}
           />
           <Text style={styles.logoText}>TRUETREE</Text>
         </View>
         <View style={styles.seperatorOne} />
         <Swiper
           loop={false}
-          showsPagination={showSwiperButtons} // 버튼 표시 여부
+          showsPagination={showSwiperButtons}
           scrollEnabled={showSwiperButtons}
           activeDotColor="#FF4C00"
           index={1}
@@ -292,8 +288,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoContainer: {
-    flexDirection: "row", // Aligns children in a row
-    alignItems: "center", // Centers children vertically in the container
+    flexDirection: "row",
+    alignItems: "center",
     marginHorizontal: "3%",
     maxHeight: "10%",
     paddingTop: "1%",
@@ -301,31 +297,31 @@ const styles = StyleSheet.create({
   image: {
     width: 40,
     height: 40,
-    marginLeft: "3%", // Add some margin to the right of the image, if needed
+    marginLeft: "3%",
   },
   logoText: {
     fontSize: 20,
     color: "#5B882C",
-    fontWeight: "400", // Makes the font weight thinner
-    flex: 1, // Takes up all available space in the row
-    textAlign: "center", // Centers the text horizontally,
+    fontWeight: "400",
+    flex: 1,
+    textAlign: "center",
     right: "260%",
   },
   seperatorOne: {
     marginTop: 5,
     marginBottom: 8,
-    height: 3, // 선의 두께를 조절합니다.
-    width: "100%", // 구분선의 너비를 조절합니다. 로고와 텍스트의 절반만큼의 길이로 설정합니다.
-    backgroundColor: "#5B882C", // 초록색으로 설정합니다.
-    borderWidth: 1, // 선의 두께를 조절합니다.
-    borderColor: "#5B882C", // 초록색으로 경계선을 설정합니다.
+    height: 3,
+    width: "100%",
+    backgroundColor: "#5B882C",
+    borderWidth: 1,
+    borderColor: "#5B882C",
   },
   seperatorTwo: {
-    height: 1, // 선의 두께를 조절합니다.
-    width: "100%", // 구분선의 너비를 조절합니다. 로고와 텍스트의 절반만큼의 길이로 설정합니다.
-    backgroundColor: "#5B882C", // 초록색으로 설정합니다.
-    borderWidth: 1, // 선의 두께를 조절합니다.
-    borderColor: "#5B882C", // 초록색으로 경계선을 설정합니다.
+    height: 1,
+    width: "100%",
+    backgroundColor: "#5B882C",
+    borderWidth: 1,
+    borderColor: "#5B882C",
     marginTop: 5,
     marginBottom: 8,
   },
@@ -380,18 +376,18 @@ const styles = StyleSheet.create({
     color: "#55433B",
   },
   button: {
-    backgroundColor: "#EB5929", // 버튼의 배경색
-    padding: 10, // 버튼 안쪽의 여백
-    borderRadius: 5, // 버튼의 모서리 둥글기
-    alignItems: "center", // 텍스트를 중앙에 정렬
+    backgroundColor: "#EB5929",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
     justifyContent: "center",
     maxWidth: "50%",
     marginHorizontal: "25%",
     marginVertical: "5%",
   },
   buttonText: {
-    color: "white", // 텍스트 색상
-    fontSize: 16, // 텍스트 크기
+    color: "white",
+    fontSize: 16,
   },
 });
 

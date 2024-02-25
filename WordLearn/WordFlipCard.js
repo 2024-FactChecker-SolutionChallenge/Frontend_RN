@@ -10,12 +10,6 @@ import {
 
 const { width } = Dimensions.get("window");
 
-// const vocabulary = [
-//     { id : 1, word: 'Word 1', mean: 'Mean 1' },
-//     { id : 2, word: 'Word 2', mean: 'Mean 2' },
-//     // ... more words
-// ];
-
 const FlipCard = ({ front, back, isFlipped, onPress }) => {
   const animatedValue = useRef(new Animated.Value(isFlipped ? 180 : 0)).current;
   const value = useRef(0);
@@ -34,7 +28,7 @@ const FlipCard = ({ front, back, isFlipped, onPress }) => {
   }, [isFlipped]);
 
   const flipCard = () => {
-    onPress(); // 클릭 이벤트 전달
+    onPress();
   };
 
   const frontAnimatedStyle = {
@@ -105,14 +99,13 @@ const VocabularyLearningScreen = ({
     const fetchWords = async () => {
       fetch("http://35.216.92.188:8080/api/study/flip-cards/word", {
         method: "GET",
-        headers: headers_config, // 헤더 추가
+        headers: headers_config,
       })
         .then((response) => {
           return response.json();
         })
         .then((json) => {
           if (json && json.length > 0) {
-            // 빈 배열이 아닌 경우에만 실행
             setVocabulary(json);
           }
         })

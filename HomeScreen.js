@@ -56,7 +56,6 @@ const HomeScreen = ({ route }) => {
       }
 
       const json = await response.json();
-      // console.log("fetch interests: ", json);
 
       return json;
     } catch (error) {
@@ -64,16 +63,8 @@ const HomeScreen = ({ route }) => {
     }
   };
 
-  // useEffect(() => {
-  //     console.log(articles); // 이 로그는 articles가 업데이트될 때마다 출력됨
-  // }, [articles]);
-
-  // userInterest가 업데이트되면 이 부분이 실행됨
-  // POST 요청을 보내는 함수
   const sendPostRequest = async (section_number) => {
     try {
-      // console.log("prev articles :", articles[0])
-
       const response = await fetch(
         `http://35.216.92.188:8080/api/interests/getarticleBySection?section=${section_number}`,
         {
@@ -89,10 +80,7 @@ const HomeScreen = ({ route }) => {
       }
 
       const json = await response.json();
-      // console.log("fetchedSend: ", json[0])
-      return json; // json 대신에 결과를 반환합니다
-      // console.log("newList :",newList)
-      // setUserInterestArticles((prevArticles) => [...prevArticles, ...json]);
+      return json;
     } catch (error) {
       console.error("Error fetching user interest news:", error);
     }
@@ -105,13 +93,11 @@ const HomeScreen = ({ route }) => {
       })
       .then((interestJson) => {
         setUserInterest(interestJson);
-        return interestJson; // 이후의 then에서 사용하기 위해 반환합니다.
+        return interestJson;
       })
       .then((interestJson) => {
-        // 여기서는 최신의 userInterest 대신 방금 설정한 interestJson을 사용합니다.
         console.log("interestJson: ", interestJson);
 
-        // Promise를 사용하여 비동기 작업을 처리합니다.
         return new Promise((resolve) => {
           if (interestJson.length > 0) {
             resolve(
@@ -127,7 +113,6 @@ const HomeScreen = ({ route }) => {
         });
       })
       .then((allResponses) => {
-        // allResponses는 위 if문의 결과인 Promise.all의 결과값이 됩니다.
         const allArticles = allResponses.flat();
         console.log("allArticles : ", allArticles[0]);
         setUserInterestArticles([...allArticles]);
@@ -135,20 +120,15 @@ const HomeScreen = ({ route }) => {
       .catch((error) => {
         console.error("요청 중 오류 발생:", error);
       });
-  }, []); // 종속성 배열을 비워 초기 마운트시에만 실행되도록 합니다.
+  }, []);
 
   useEffect(() => {
-    // console.log("User Interest Articles 업데이트됨:", userInterestArticles[0]);
-    // console.log("articles 길이 : ", articles ? articles.length : null);
     console.log(
       "userInterestArticles 길이 : ",
       userInterestArticles ? userInterestArticles.length : null
     );
   }, []);
 
-  // useEffect(()=>{
-  //     console.log(articles[-1]);
-  // },[userInterest, userInterestArticles])
   const sectionNum = {
     POLITICS: 100,
     ECONOMY: 101,
@@ -164,7 +144,6 @@ const HomeScreen = ({ route }) => {
   const [userInterestArticles, setUserInterestArticles] = useState([]);
 
   const sections = {
-    // 99: "My Interests",
     100: "Politics",
     101: "Economy",
     102: "Society",
@@ -181,23 +160,16 @@ const HomeScreen = ({ route }) => {
   };
 
   const filterArticlesBySection = (sectionId) => {
-    // 이미 선택된 섹션이 다시 클릭된 경우 선택 해제
     if (selectedSection === sectionId) {
       setSelectedSection(null);
     } else {
-      // 다른 섹션이 클릭되면 선택 상태 업데이트
       setSelectedSection(sectionId);
       console.log(sectionId);
     }
   };
 
-  // console.log("articles: ", articles)
-
   const renderArticleItem = ({ item }) => (
-    <LinearGradient
-      colors={["#FFFFFF", "#FFFFFF"]} // Use the two main colors of your gradient
-      style={styles.newsBox}
-    >
+    <LinearGradient colors={["#FFFFFF", "#FFFFFF"]} style={styles.newsBox}>
       <TouchableOpacity
         activeOpacity={1}
         onPress={() => handleItemClick(item.id)}
@@ -207,7 +179,6 @@ const HomeScreen = ({ route }) => {
           <Text style={styles.articleTitle}>{item.title}</Text>
           <Text style={styles.date}>{item.date}</Text>
         </View>
-        {/* <Text style = {styles.credibilityText}>{parseInt(item.credibility*100) >=40 ? "TrustWorthy" : ""}</Text> */}
       </TouchableOpacity>
     </LinearGradient>
   );
@@ -217,12 +188,11 @@ const HomeScreen = ({ route }) => {
       <View style={styles.logoContainer}>
         <Image
           style={styles.image}
-          source={require("./assets/img/truetree_logo.png")} // 이미지 파일 경로 지정
+          source={require("./assets/img/truetree_logo.png")}
         />
         <Text style={styles.logoText}>TRUETREE</Text>
       </View>
       <View style={styles.seperatorOne} />
-      {/* <View style={styles.seperatorTwo} /> */}
       <ScrollView
         style={styles.sectionBar}
         horizontal={true}
@@ -234,7 +204,7 @@ const HomeScreen = ({ route }) => {
             key={key}
             style={[
               styles.sectionButton,
-              selectedSection === key && styles.sectionButtonSelected, // 현재 선택된 섹션 스타일
+              selectedSection === key && styles.sectionButtonSelected,
             ]}
             onPress={() => filterArticlesBySection(key)}
           >
@@ -266,10 +236,7 @@ const HomeScreen = ({ route }) => {
           style={styles.articleList}
           showsVerticalScrollIndicator={false}
           ListHeaderComponent={
-            <LinearGradient
-              colors={["#f7be7c", "#f5a984"]} // Use the two main colors of your gradient
-              style={styles.card}
-            >
+            <LinearGradient colors={["#f7be7c", "#f5a984"]} style={styles.card}>
               <View style={styles.gradientContainer}>
                 <Image
                   source={require("./assets/img/truetree_다람쥐.png")}
@@ -304,8 +271,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoContainer: {
-    flexDirection: "row", // Aligns children in a row
-    alignItems: "center", // Centers children vertically in the container
+    flexDirection: "row",
+    alignItems: "center",
     marginHorizontal: "3%",
     maxHeight: "10%",
     paddingTop: "1%",
@@ -313,40 +280,39 @@ const styles = StyleSheet.create({
   image: {
     width: 40,
     height: 40,
-    marginLeft: "3%", // Add some margin to the right of the image, if needed
+    marginLeft: "3%",
   },
   logoText: {
     fontSize: 20,
     color: "#5B882C",
-    fontWeight: "400", // Makes the font weight thinner
-    flex: 1, // Takes up all available space in the row
-    textAlign: "center", // Centers the text horizontally,
+    fontWeight: "400",
+    flex: 1,
+    textAlign: "center",
     right: "260%",
   },
   seperatorOne: {
     marginTop: 5,
     marginBottom: 8,
-    height: 3, // 선의 두께를 조절합니다.
-    width: "100%", // 구분선의 너비를 조절합니다. 로고와 텍스트의 절반만큼의 길이로 설정합니다.
-    backgroundColor: "#5B882C", // 초록색으로 설정합니다.
-    borderWidth: 1, // 선의 두께를 조절합니다.
-    borderColor: "#5B882C", // 초록색으로 경계선을 설정합니다.
+    height: 3,
+    width: "100%",
+    backgroundColor: "#5B882C",
+    borderWidth: 1,
+    borderColor: "#5B882C",
   },
   seperatorTwo: {
-    height: 1, // 선의 두께를 조절합니다.
-    width: "100%", // 구분선의 너비를 조절합니다. 로고와 텍스트의 절반만큼의 길이로 설정합니다.
-    backgroundColor: "#5B882C", // 초록색으로 설정합니다.
-    borderWidth: 1, // 선의 두께를 조절합니다.
-    borderColor: "#5B882C", // 초록색으로 경계선을 설정합니다.
+    height: 1,
+    width: "100%",
+    backgroundColor: "#5B882C",
+    borderWidth: 1,
+    borderColor: "#5B882C",
     marginTop: 5,
     marginBottom: 8,
   },
   sectionBar: {
-    // backgroundColor: 'blue',
     marginHorizontal: 10,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    maxHeight: 50, // 카테고리 바의 최대 높이를 제한
+    maxHeight: 50,
   },
   sectionButton: {
     paddingVertical: 5,
@@ -358,7 +324,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   sectionButtonSelected: {
-    backgroundColor: "#EB5929", // 선택된 버튼의 배경색
+    backgroundColor: "#EB5929",
   },
   sectionText: {
     fontSize: 14,
@@ -372,8 +338,8 @@ const styles = StyleSheet.create({
     margin: 15,
     borderRadius: 20,
     padding: 25,
-    alignItems: "center", // This aligns children along the cross axis of the current line, similar to 'align-items' in CSS
-    justifyContent: "center", // This defines the alignment along the main axis, similar to 'justify-content' in CSS
+    alignItems: "center",
+    justifyContent: "center",
     shadowColor: "#EAEAEA",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
@@ -381,17 +347,17 @@ const styles = StyleSheet.create({
     elevation: 5,
     maxWidth: "100%",
     minHeight: 100,
-    backgroundColor: "#FFFFFF", // Don't forget to set a background color
+    backgroundColor: "#FFFFFF",
   },
   imagesq: {
     width: 100,
     height: 100,
-    marginRight: 15, // Add some margin to the right of the image, if needed
+    marginRight: 15,
   },
   gradientContainer: {
-    flexDirection: "row", // Set the children to be in a row
-    alignItems: "center", // Align children vertically in the middle
-    width: "100%", // Ensure the container takes the full width of the card
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
   },
   gradientTextContainer: {
     flexDirection: "column",
@@ -403,12 +369,12 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#55433B",
     textAlign: "right",
-    flex: 1, // Allow text to fill the remaining space
+    flex: 1,
     height: "7%",
   },
   newsBox: {
     maxWidth: "93%",
-    marginBottom: 10, // Add some bottom margin to separate each news box
+    marginBottom: 10,
     margin: 7,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -424,8 +390,8 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1.2,
     borderColor: "#fc7012",
-    flexDirection: "row", // Arrange the content in a row
-    alignItems: "center", // Center items along the cross axis
+    flexDirection: "row",
+    alignItems: "center",
     borderRadius: 20,
   },
   articleLeft: {
@@ -444,7 +410,7 @@ const styles = StyleSheet.create({
   },
   credibilityText: {
     textAlign: "right",
-    flex: 1, // Expand to fill available space
+    flex: 1,
     color: "#55433B",
   },
   loading: {

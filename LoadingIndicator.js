@@ -7,8 +7,8 @@ const LoadingSpinner = () => {
   const startAnimation = useCallback(() => {
     Animated.loop(
       Animated.timing(animationValue, {
-        toValue: 1, // 애니매이션의 100%일때의 값을 추출
-        duration: 700, // 애니메이션이 진행되는 시간
+        toValue: 1,
+        duration: 700,
         useNativeDriver: true,
       })
     ).start();
@@ -18,8 +18,6 @@ const LoadingSpinner = () => {
     startAnimation();
   }, [startAnimation]);
 
-  // inputRange : animationValue의 변화값
-  // outputRange : 해당 변화값에 대한 매칭되는 deg 값
   const RotateData = animationValue.interpolate({
     inputRange: [0, 1],
     outputRange: ["0deg", "360deg"],

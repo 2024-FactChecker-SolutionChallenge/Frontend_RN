@@ -39,7 +39,6 @@ const LearnScreen = ({ route }) => {
         }
 
         const json = await response.json();
-        // console.log("fetch data", json);
 
         setTitle(json.title);
         setArticle(json.article);
@@ -63,7 +62,6 @@ const LearnScreen = ({ route }) => {
         }
 
         const json = await response.json();
-        // console.log("fetch data", json);
 
         setTitle(json.title);
         setArticle(json.article);
@@ -77,19 +75,6 @@ const LearnScreen = ({ route }) => {
     fetchNews();
   }, []);
 
-  // const title = "UN 출신 김정훈, 교통사고 낸 뒤 음주측정 거부…검찰 송치";
-  // const article = `
-  // 그룹 UN 출신 가수 겸 배우 김정훈씨가 운전 중 사고를 내고는 음주측정을 거부한 혐의로 검찰에 불구속 송치됐다.
-
-  // 서울 수서경찰서는 차를 몰다 사고를 낸 뒤 음주측정을 거부한 혐의로 김씨를 검찰에 불구속 송치했다고 8일 밝혔다.
-
-  // 경찰에 따르면 김씨는 지난해 12월 29일 오전 3시 30분쯤 서울 강남구 일원동 남부순환로에서 진로를 변경해 앞서가던 차량과 부딪히는 사고를 내고 현장에 출동한 경찰의 음주측정을 거부한 혐의(도로교통법상 음주측정거부)를 받는다.
-
-  // 이 사고로 상대 차량 운전자가 경상을 입어 교통사고처리특례법상 치상 혐의도 적용됐다.
-
-  // 김씨가 음주, 교통과 관련한 사건·사고로 물의를 일으킨 것은 이번이 처음이 아니다. 김씨는 2011년 7월 음주운전 혐의로 입건돼 면허가 취소된 바 있다.
-  // `;
-
   const [isSummaryMode, setIsSummaryMode] = useState(false);
   const [highlightMode, setHighlightMode] = useState(false);
   const [selectedWords, setSelectedWords] = useState([]);
@@ -101,30 +86,24 @@ const LearnScreen = ({ route }) => {
   const [mean, setMean] = useState("");
 
   const addDictionary = (word, mean, selectedWordsGroup) => {
-    // "word" 키가 이미 존재하는지 확인
     if (dictionaryList.some((item) => item.word === word)) {
       console.log("이미 추가된 단어입니다.");
       return;
     }
 
-    // 새로운 딕셔너리 생성 및 추가
     const newDictionary = { word, mean };
     setDictionaryList([...dictionaryList, newDictionary]);
 
-    // 입력 필드 초기화
     setWord("");
     setMean("");
   };
 
   const deleteDictionary = (wordToDelete) => {
-    // 해당 word를 가진 딕셔너리를 찾아 인덱스를 가져옴
     const indexToDelete = dictionaryList.findIndex(
       (item) => item.word === wordToDelete
     );
 
-    // 인덱스를 찾은 경우에만 삭제 수행
     if (indexToDelete !== -1) {
-      // 인덱스에 해당하는 딕셔너리를 제외한 새 리스트 생성
       const newList = dictionaryList.filter(
         (_, index) => index !== indexToDelete
       );
@@ -137,13 +116,11 @@ const LearnScreen = ({ route }) => {
   const words = article && article.split(/\s+/).filter((word) => word !== "");
   const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-  // Access your API key as an environment variable (see "Set up your API key" above)
   const genAI = new GoogleGenerativeAI(process.env.API_KEY);
   const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
   async function fetchResponse(word, selectedWordsGroup) {
     setIsLoading(true);
-    // For text-only input, use the gemini-pro model
     const safety_settings = [
       {
         category: "HARM_CATEGORY_HARASSMENT",
@@ -180,20 +157,20 @@ const LearnScreen = ({ route }) => {
     if (highlightMode) {
       if (selectedWords.includes(word)) {
         setSelectedWords(selectedWords.filter((w) => w !== word));
-        setShowBox(false); // 박스 숨기기
+        setShowBox(false);
         deleteDictionary(word);
       } else {
         setSelectedWords([...selectedWords, word]);
 
         try {
-          const text = await fetchResponse(word, selectedWordsGroup); // 결과를 기다림
+          const text = await fetchResponse(word, selectedWordsGroup);
           setResponse(`${word} means... \n ${text}`);
-          setShowBox(true); // fetchResponse가 완료된 후에 박스 표시
+          setShowBox(true);
         } catch {
           setResponse(
             "Server response Error. Try highlighting the word again!"
           );
-          setShowBox(true); // fetchResponse가 완료된 후에 박스 표시
+          setShowBox(true);
           setIsLoading(false);
         }
       }
@@ -210,9 +187,8 @@ const LearnScreen = ({ route }) => {
 
   const toggleHighlightMode = () => {
     if (highlightMode) {
-      // Send selectedWords to the backend
       sendWordsToBackend();
-      setSelectedWords([]); // Reset selected words
+      setSelectedWords([]);
     }
     setHighlightMode(!highlightMode);
   };
@@ -248,9 +224,7 @@ const LearnScreen = ({ route }) => {
     }
   };
 
-  // Dummy function to simulate sending words to backend
   const sendWordsToBackend = () => {
-    // Implement backend API call here
     setDictionaryList([]);
     sendWords();
   };
@@ -284,7 +258,6 @@ const LearnScreen = ({ route }) => {
           threshold: "BLOCK_NONE",
         },
       ];
-      // For text-only input, use the gemini-pro model
       const model = genAI.getGenerativeModel({
         model: "gemini-pro",
         safety_settings,
@@ -312,8 +285,8 @@ const LearnScreen = ({ route }) => {
           onValueChange={() => setIsSummaryMode(!isSummaryMode)}
           value={isSummaryMode}
           style={styles.toggle}
-          trackColor={{ false: "#c9c9c9", true: "#c9c9c9" }} // 꺼짐/켜짐 상태의 트랙 색상
-          thumbColor={isSummaryMode ? "#EB5929" : "#EB5929"} // 손잡이 색상
+          trackColor={{ false: "#c9c9c9", true: "#c9c9c9" }}
+          thumbColor={isSummaryMode ? "#EB5929" : "#EB5929"}
         />
         <Text style={styles.modeText}>
           {isSummaryMode ? "Summarize Mode" : "Check Words Mode"}
@@ -359,7 +332,7 @@ const LearnScreen = ({ route }) => {
           <>
             <TextInput
               style={styles.textInput}
-              multiline={true} // 여러 줄 입력 가능하게 설정
+              multiline={true}
               onChangeText={(text) => setInputText(text)}
               value={inputText}
               placeholder="Summarize here!"
@@ -388,13 +361,12 @@ const LearnScreen = ({ route }) => {
                   <TouchableOpacity
                     key={index}
                     onPress={() => {
-                      // 현재 단어와 그 앞뒤 단어들 선택
                       const selectedWordsGroup = [
-                        ...(index > 1 ? [words.slice(index - 2, index)] : []), // 앞 단어 (있으면)
-                        word, // 현재 단어
+                        ...(index > 1 ? [words.slice(index - 2, index)] : []),
+                        word,
                         ...(index < words.length - 2
                           ? [words.slice(index, index + 2)]
-                          : []), // 뒤 단어 (있으면)
+                          : []),
                       ].join(" ");
                       console.log(selectedWordsGroup);
                       selectWord(word, selectedWordsGroup);
@@ -452,13 +424,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    alignSelf: "flex-start", // 부모 컨테이너의 시작 부분에 정렬
-    padding: 20, // 텍스트 주위에 약간의 여백을 추가
+    alignSelf: "flex-start",
+    padding: 20,
     fontSize: 20,
   },
   toggleContainer: {
     flexDirection: "row",
-    justifyContent: "space-between", // 요소들을 컨테이너 양쪽 끝으로 정렬
+    justifyContent: "space-between",
     alignItems: "center",
     margin: 20,
     backgroundColor: "#f0f0f0",
@@ -467,12 +439,12 @@ const styles = StyleSheet.create({
   toggle: {
     position: "relative",
     left: "-63%",
-    transform: [{ scaleX: 1.3 }, { scaleY: 1.3 }], // 크기 조절
-    trackColor: { false: "#767577", true: "orange" }, // 토글바 배경색
-    thumbColor: "#f4f3f4", // 토글 버튼 색상
-    ios_backgroundColor: "#3e3e3e", // iOS에서의 배경색
-    paddingTop: 10, // 상하 여백
-    paddingHorizontal: 20, // 좌우 여백
+    transform: [{ scaleX: 1.3 }, { scaleY: 1.3 }],
+    trackColor: { false: "#767577", true: "orange" },
+    thumbColor: "#f4f3f4",
+    ios_backgroundColor: "#3e3e3e",
+    paddingTop: 10,
+    paddingHorizontal: 20,
   },
   modeText: {
     textAlign: "center",
@@ -502,24 +474,22 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#ddd",
     flexDirection: "row",
-    justifyContent: "space-between", // 요소들을 컨테이너 양쪽 끝으로 정렬
+    justifyContent: "space-between",
     alignItems: "center",
     borderRadius: 100,
-    // alignSelf: 'flex-start',
-    // marginBottom: 10,
   },
   nonHighlightModeButton: {
     width: 55,
     height: 55,
     padding: 10,
     flexDirection: "row",
-    justifyContent: "space-between", // 요소들을 컨테이너 양쪽 끝으로 정렬
+    justifyContent: "space-between",
     alignItems: "center",
     borderRadius: 100,
   },
   highlightedWord: {
     backgroundColor: "#FFFC70",
-    marginVertical: 5, // margin 대신 padding 사용
+    marginVertical: 5,
   },
   articleText: {
     flexDirection: "row",
@@ -538,21 +508,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#fafafa",
     borderRadius: 10,
     padding: 10,
-    height: 150, // 필요한 크기에 따라 조정
+    height: 150,
     textAlign: "center",
   },
   button: {
-    backgroundColor: "#EB5929", // 버튼의 배경색
-    padding: 10, // 버튼 안쪽의 여백
-    borderRadius: 5, // 버튼의 모서리 둥글기
-    alignItems: "center", // 텍스트를 중앙에 정렬
+    backgroundColor: "#EB5929",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
     justifyContent: "center",
     minWidth: "50%",
     marginTop: 10,
   },
   buttonText: {
-    color: "white", // 텍스트 색상
-    fontSize: 16, // 텍스트 크기
+    color: "white",
+    fontSize: 16,
   },
   feedbackBox: {
     marginTop: 20,
@@ -572,7 +542,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     textAlign: "center",
-    backgroundColor: "#ffc4b0", // 반투명 배경
+    backgroundColor: "#ffc4b0",
     borderRadius: 15,
     paddingVertical: 2,
     paddingHorizontal: 3,

@@ -30,7 +30,6 @@ export default function FactCheck({ route }) {
       yt_title: "enter url and verify youtube videos",
     },
   ]);
-  // const [prevLength, setPrevLength] = useState(null);
 
   const [url, setUrl] = useState(null);
 
@@ -54,23 +53,18 @@ export default function FactCheck({ route }) {
       const json = await response.json();
       console.log("fetch data", json);
       setVideos(json.reverse());
-      // 응답의 배열 길이가 이전 데이터 배열 길이보다 길 경우에만 needToLoad 감소
     } catch (error) {
       console.error("Error fetching news:", error);
     }
   };
 
   useEffect(() => {
-    // 컴포넌트가 마운트될 때 fetchNews 함수를 즉시 실행
     fetchNews();
   }, []);
 
   const sendNews = async () => {
-    // setPrevLength(videos.length);
-
     if (url && url.trim() !== "") {
       console.log("send");
-      // console.log('sended url : ', url)
       try {
         const response = await fetch(
           "http://35.216.92.188:8080/api/YoutubeNews/add",
@@ -87,7 +81,6 @@ export default function FactCheck({ route }) {
           }
         );
 
-        // console.log("console.log sendNews response : ", response)
         const json = await response.json();
 
         if (response.ok) {
@@ -108,20 +101,13 @@ export default function FactCheck({ route }) {
   };
 
   const navigation = useNavigation();
-  // 기사 항목을 클릭했을 때 실행될 함수
   const handleItemClick = (articleId) => {
-    // console.log('Clicked article ID:', articleId);
     const prevPage = "fact";
     navigation.navigate("Check words & Summarize", { articleId, prevPage });
-    // 실제 앱에서는 여기서 상세 페이지로 이동하는 등의 작업을 수행합니다.
   };
 
-  // 뉴스 기사를 렌더링하는 함수입니다.
   const renderArticleItem = ({ item }) => (
-    <LinearGradient
-      colors={["#FFFFFF", "#FFFFFF"]} // Use the two main colors of your gradient
-      style={styles.newsBox}
-    >
+    <LinearGradient colors={["#FFFFFF", "#FFFFFF"]} style={styles.newsBox}>
       <TouchableOpacity
         activeOpacity={1}
         onPress={() => handleItemClick(item.id)}
@@ -142,7 +128,6 @@ export default function FactCheck({ route }) {
     setVideos((prevVideos) =>
       prevVideos.map((news) => {
         if (news.id === youtubeNewsId) {
-          // 'show' 속성 토글
           return { ...news, show: !news.show };
         }
         return news;
@@ -150,14 +135,13 @@ export default function FactCheck({ route }) {
     );
   };
 
-  // 유튜브 영상 항목을 렌더링하는 함수
   const renderVideoItem = ({ item }) => (
     <View>
       {item.loadingStatus ? (
         <>
           <TouchableOpacity activeOpacity={1}>
             <LinearGradient
-              colors={["#FFDAAD", "#FFDAAD"]} // Use the two main colors of your gradient
+              colors={["#FFDAAD", "#FFDAAD"]}
               style={styles.containerYT}
             >
               <ActivityIndicator size="large" color="#EB5929" />
@@ -315,11 +299,6 @@ export default function FactCheck({ route }) {
 }
 
 const styles = StyleSheet.create({
-  // container: {
-  //     padding: 10,
-  //     backgroundColor: '#f9f9f9',
-  //     marginBottom: 10,
-  // },
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
@@ -327,8 +306,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoContainer: {
-    flexDirection: "row", // Aligns children in a row
-    alignItems: "center", // Centers children vertically in the container
+    flexDirection: "row",
+    alignItems: "center",
     marginHorizontal: "3%",
     maxHeight: "10%",
     paddingTop: "1%",
@@ -336,31 +315,31 @@ const styles = StyleSheet.create({
   image: {
     width: 40,
     height: 40,
-    marginLeft: "3%", // Add some margin to the right of the image, if needed
+    marginLeft: "3%",
   },
   logoText: {
     fontSize: 20,
     color: "#5B882C",
-    fontWeight: "400", // Makes the font weight thinner
-    flex: 1, // Takes up all available space in the row
-    textAlign: "center", // Centers the text horizontally,
+    fontWeight: "400",
+    flex: 1,
+    textAlign: "center",
     right: "260%",
   },
   seperatorOne: {
     marginTop: 5,
     marginBottom: 8,
-    height: 3, // 선의 두께를 조절합니다.
-    width: "100%", // 구분선의 너비를 조절합니다. 로고와 텍스트의 절반만큼의 길이로 설정합니다.
-    backgroundColor: "#5B882C", // 초록색으로 설정합니다.
-    borderWidth: 1, // 선의 두께를 조절합니다.
-    borderColor: "#5B882C", // 초록색으로 경계선을 설정합니다.
+    height: 3,
+    width: "100%",
+    backgroundColor: "#5B882C",
+    borderWidth: 1,
+    borderColor: "#5B882C",
   },
   seperatorTwo: {
-    height: 1, // 선의 두께를 조절합니다.
-    width: "100%", // 구분선의 너비를 조절합니다. 로고와 텍스트의 절반만큼의 길이로 설정합니다.
-    backgroundColor: "#5B882C", // 초록색으로 설정합니다.
-    borderWidth: 1, // 선의 두께를 조절합니다.
-    borderColor: "#5B882C", // 초록색으로 경계선을 설정합니다.
+    height: 1,
+    width: "100%",
+    backgroundColor: "#5B882C",
+    borderWidth: 1,
+    borderColor: "#5B882C",
     marginTop: 5,
     marginBottom: 8,
   },
@@ -388,8 +367,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     minHeight: 80,
     padding: 15,
-    flexDirection: "row", // 내용을 행 방향으로 정렬
-    alignItems: "center", // 세로 방향으로 중앙 정렬
+    flexDirection: "row",
+    alignItems: "center",
     minWidth: "90%",
     marginVertical: 10,
   },
@@ -397,19 +376,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   imageYT: {
-    width: 40, // 이미지 크기 조정
-    height: 40, // 이미지 크기 조정,
+    width: 40,
+    height: 40,
     justifyContent: "center",
   },
   YTContent: {
-    flexDirection: "column", // 수직 방향으로 정렬
+    flexDirection: "column",
     marginLeft: 10,
-    maxWidth: "70%", // 최대 너비 조정
+    maxWidth: "70%",
     maxHeight: "100%",
   },
   YTTitle: {
-    fontSize: 16, // 제목의 글씨 크기를 조정
-    fontWeight: "bold", // 글씨를 굵게
+    fontSize: 16,
+    fontWeight: "bold",
     color: "#55433B",
   },
   YTdate: {
@@ -418,7 +397,7 @@ const styles = StyleSheet.create({
   },
   newsBox: {
     maxWidth: "93%",
-    marginBottom: 10, // Add some bottom margin to separate each news box
+    marginBottom: 10,
     margin: 7,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -436,8 +415,8 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1,
     borderColor: "#fc7012",
-    flexDirection: "row", // Arrange the content in a row
-    alignItems: "center", // Center items along the cross axis
+    flexDirection: "row",
+    alignItems: "center",
     borderRadius: 20,
   },
   articleLeft: {
@@ -456,7 +435,7 @@ const styles = StyleSheet.create({
   },
   credibilityText: {
     textAlign: "right",
-    flex: 1, // Expand to fill available space
+    flex: 1,
     color: "#55433B",
   },
   keywordText: {
@@ -499,12 +478,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     paddingVertical: 5,
   },
-  // loading : {
-  //     width : 30,
-  //     height :30
-  // }
   allNewsContainer: {
-    // marginBottom: 50,
     flex: 1,
   },
   newsContainer: {

@@ -1,23 +1,17 @@
 import { ImageBackground, View, Text, StyleSheet } from "react-native";
 import React, { useState, useRef, useEffect } from "react";
 
-// ... your other imports
-
 const BeforeHome = () => {
   useEffect(() => {}, [styles]);
 
   return (
     <ImageBackground
-      source={require("./assets/img/truetree_background.png")} // Replace with your local image path
+      source={require("./assets/img/truetree_background.png")}
       style={styles.backgroundImage}
-    >
-      {/* <Text style = {styles.text}>Welcome to</Text>
-        <Text style = {styles.text}>TRUETREE</Text> */}
-    </ImageBackground>
+    ></ImageBackground>
   );
 };
 
-// Add this to your StyleSheet
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
@@ -34,7 +28,6 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     bottom: "10%",
   },
-  // ... your other styles ...
 });
 
 export default BeforeHome;

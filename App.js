@@ -1,8 +1,7 @@
-// App.js
 import React, { useState, useRef, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import Ionicons from "react-native-vector-icons/Ionicons"; // Make sure to install this package
+import Ionicons from "react-native-vector-icons/Ionicons";
 import HomeScreen from "./HomeScreen";
 import WordList from "./WordLearn/WordList";
 import FactCheck from "./FactCheck";
@@ -26,26 +25,19 @@ function App() {
 
   const [showBeforeHome, setShowBeforeHome] = useState(false);
 
-  // ... rest of your code ...
-
   useEffect(() => {
-    // Check if the user is authenticated
     if (isAuthenticated) {
-      // Show BeforeHome component
       setShowBeforeHome(true);
 
-      // Hide BeforeHome component after 4 seconds
       const timer = setTimeout(() => {
         setShowBeforeHome(false);
       }, 4000);
 
-      // Clean up the timer
       return () => clearTimeout(timer);
     }
   }, [isAuthenticated]);
 
   const getTabBarVisibility = (route) => {
-    // Get the current route name
     const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
 
     if (routeName === "Quiz" || routeName === "Results") {
@@ -55,7 +47,6 @@ function App() {
     }
   };
 
-  // 인증된 사용자만 접근할 수 있는 메인 탭 네비게이터
   const MainTabNavigator = () => (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -70,13 +61,12 @@ function App() {
           } else if (route.name === "MyPage") {
             iconName = focused ? "person-circle" : "person-circle-outline";
           }
-          // You can return any component that you like here!
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: "#EB5929",
         tabBarInactiveTintColor: "white",
         tabBarStyle: {
-          backgroundColor: "#55433B", // 원하는 배경색으로 설정
+          backgroundColor: "#55433B",
           display: getTabBarVisibility(route),
         },
       })}
@@ -108,7 +98,6 @@ function App() {
     </Tab.Navigator>
   );
 
-  // 인증 화면을 위한 스택 네비게이터
   const AuthStackNavigator = () => (
     <Stack.Navigator>
       <Stack.Screen name="Login" options={{ headerShown: false }}>
@@ -127,11 +116,11 @@ function App() {
         options={{
           headerShown: true,
           headerStyle: {
-            backgroundColor: "#EB5929", // 헤더의 배경색
+            backgroundColor: "#EB5929",
             justifyContent: "center",
           },
           headerTitleStyle: {
-            color: "white", // 제목의 색상
+            color: "white",
           },
         }}
       />
@@ -175,7 +164,7 @@ function HomeStack({ navigation, route }) {
       navigation.setOptions({
         tabBarStyle: {
           display: "flex",
-          backgroundColor: "#55433B", // 예시 색상
+          backgroundColor: "#55433B",
         },
       });
     }
@@ -195,13 +184,13 @@ function HomeStack({ navigation, route }) {
         initialParams={{ accessToken, refreshToken }}
         options={{
           headerShown: true,
-          tabBarStyle: { display: "none" }, // 이 줄을 추가
+          tabBarStyle: { display: "none" },
           headerStyle: {
-            backgroundColor: "#EB5929", // 헤더의 배경색
+            backgroundColor: "#EB5929",
             justifyContent: "center",
           },
           headerTitleStyle: {
-            color: "white", // 제목의 색상
+            color: "white",
           },
         }}
       />
@@ -224,7 +213,7 @@ function FactCheckStack({ navigation, route }) {
       navigation.setOptions({
         tabBarStyle: {
           display: "flex",
-          backgroundColor: "#55433B", // 예시 색상
+          backgroundColor: "#55433B",
         },
       });
     }
@@ -244,14 +233,14 @@ function FactCheckStack({ navigation, route }) {
         initialParams={{ accessToken, refreshToken }}
         options={{
           headerShown: true,
-          tabBarStyle: { display: "none" }, // 이 줄을 추가
+          tabBarStyle: { display: "none" },
           headerStyle: {
-            backgroundColor: "#EB5929", // 헤더의 배경색
+            backgroundColor: "#EB5929",
             justifyContent: "center",
           },
           headerTitleStyle: {
-            color: "white", // 제목의 색상
-            fontWeight: "bold", // 제목의 글꼴 두껍게 설정
+            color: "white",
+            fontWeight: "bold",
           },
         }}
       />
@@ -262,7 +251,6 @@ function FactCheckStack({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    //marginTop: (StatusBar.currentHeight || 0) + 10, // Adjust for Android status bar
   },
 });
 

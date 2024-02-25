@@ -76,9 +76,6 @@ const SignupScreen = () => {
     });
   };
 
-  // console.log(selectedLearningLevel)
-  // console.log(selectedInterests)
-
   const interestsJson = {
     1: "POLITICS",
     2: "ECONOMY",
@@ -91,7 +88,6 @@ const SignupScreen = () => {
   const navigation = useNavigation();
 
   const handleSignup = () => {
-    // E-mail, Nickname, P/W, 약관 동의 여부 등의 유효성을 검사합니다.
     if (!email || !username || !password) {
       alert("Enter all the fields.");
       return;
@@ -99,7 +95,6 @@ const SignupScreen = () => {
       if (!codeEqual || !pwEqual) {
         alert("The input isn't valid");
       } else {
-        // interestsJson 객체의 값들을 배열로 가져옴
         const filteredDictionary = {};
 
         Object.entries(interestsJson).forEach(([key, value]) => {
@@ -123,23 +118,21 @@ const SignupScreen = () => {
         })
           .then((response) => {
             if (!response.ok) {
-              throw new Error("Login failed"); // 로그인 실패 처리
+              throw new Error("Login failed");
             }
             return response.json();
           })
           .then((json) => {
             console.log(json);
-            navigation.navigate("Login"); // 이 부분을 성공 로직에 맞게 조정
+            navigation.navigate("Login");
           })
           .catch((error) => {
             console.error(error);
-            // 에러 처리 로직
           });
       }
     }
   };
 
-  // Render function for the interests FlatList
   const renderInterestItem = ({ item }) => (
     <View style={styles.interestButtonBox}>
       <TouchableOpacity
@@ -293,22 +286,9 @@ const SignupScreen = () => {
         />
       </View>
 
-      {/* 회원가입 버튼 */}
       <TouchableOpacity style={styles.button} onPress={handleSignup}>
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
-
-      {/* 스위치 */}
-      {/* <View style={styles.switchContainer}>
-            <Text style={styles.switchLabel}>약관에 동의합니다</Text>
-            <Switch
-                trackColor={{ false: "#767577", true: "#81b0ff" }}
-                thumbColor={isAgree ? "#f5dd4b" : "#f4f3f4"}
-                ios_backgroundColor="#3e3e3e"
-                onValueChange={toggleSwitch}
-                value={isAgree}
-            />
-        </View> */}
     </View>
   );
 };
@@ -366,19 +346,19 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   emailInput: {
-    width: "70%", // 이메일 입력란의 너비
+    width: "70%",
     height: 40,
     borderBottomWidth: 1,
     borderColor: "#55433B",
-    marginRight: 10, // 버튼과의 간격
+    marginRight: 10,
     marginVertical: "5%",
   },
   authInput: {
-    width: "70%", // 이메일 입력란의 너비
+    width: "70%",
     height: 40,
     borderBottomWidth: 1,
     borderColor: "#55433B",
-    marginRight: 10, // 버튼과의 간격
+    marginRight: 10,
   },
   authButton: {
     justifyContent: "center",
@@ -391,7 +371,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 20,
     marginBottom: 15,
-    // 여기에 추가 버튼 스타일을 정의할 수 있어
   },
   authText: {
     color: "white",
@@ -428,7 +407,6 @@ const styles = StyleSheet.create({
     marginRight: 8,
     color: "#55433B",
   },
-  // 스위치와 관련된 스타일을 추가합니다.
   switchContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -438,7 +416,6 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   outerCircle: {
-    // ... Styles for the outer circle of the radio button
     height: 20,
     width: 20,
     borderRadius: 10,
@@ -449,7 +426,6 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   innerCircle: {
-    // ... Styles for the inner circle of the radio button
     height: 10,
     width: 10,
     borderRadius: 5,
@@ -466,7 +442,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   interestButtonBox: {
-    marginHorizontal: 10, // Space between items
+    marginHorizontal: 10,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -489,10 +465,10 @@ const styles = StyleSheet.create({
     color: "white",
   },
   button: {
-    backgroundColor: "#55433B", // 버튼의 배경색
-    padding: 10, // 버튼 안쪽의 여백
-    borderRadius: 5, // 버튼의 모서리 둥글기
-    alignItems: "center", // 텍스트를 중앙에 정렬
+    backgroundColor: "#55433B",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
     justifyContent: "center",
     maxWidth: "50%",
     marginHorizontal: "25%",

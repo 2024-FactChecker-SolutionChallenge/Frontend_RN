@@ -14,8 +14,6 @@ import Svg, { Circle } from "react-native-svg";
 
 function MyPage({ route }) {
   const { accessToken, refreshToken } = route.params;
-
-  // 예시 데이터
   const [articlesReadThisWeek, setArticlesReadThisWeek] = useState(0);
   const [totalArticlesGoal, setTotalArticlesGoal] = useState(0);
   const [quizScoreThisWeek, setQuizScoreThisWeek] = useState(0);
@@ -39,10 +37,8 @@ function MyPage({ route }) {
 
       const json = await response.json();
       console.log("fetch data", json);
-      // setArticlesReadThisWeek(json.weekly_total_read);
       setArticlesReadThisWeek(7);
       setTotalArticlesGoal(json.weekly_read_goal);
-      // setQuizScoreThisWeek(json.weekly_total_quiz);
       setQuizScoreThisWeek(26);
       setTotalQuizScoreGoal(json.weekly_quiz_goal);
       setNickName(json.nickname);
@@ -56,7 +52,7 @@ function MyPage({ route }) {
     fetchMyPage();
   }, []);
 
-  const rate = articlesReadThisWeek / totalArticlesGoal; // 0.0 (투명) 에서 1.0 (불투명) 사이의 값
+  const rate = articlesReadThisWeek / totalArticlesGoal;
 
   const badges = [
     { id: "1", src: require("./assets/img/badges/badge1.png") },
@@ -67,7 +63,6 @@ function MyPage({ route }) {
     { id: "6", src: require("./assets/img/badges/badge2.png") },
     { id: "7", src: require("./assets/img/badges/badge3.png") },
     { id: "8", src: require("./assets/img/badges/badge4.png") },
-    // 여기에 더 많은 뱃지 이미지들을 추가할 수 있어
   ];
 
   const onPress = () => {};
@@ -89,12 +84,11 @@ function MyPage({ route }) {
       <View style={styles.logoContainer}>
         <Image
           style={styles.image}
-          source={require("./assets/img/truetree_logo.png")} // 이미지 파일 경로 지정
+          source={require("./assets/img/truetree_logo.png")}
         />
         <Text style={styles.logoText}>TRUETREE</Text>
       </View>
       <View style={styles.seperatorOne} />
-      {/* <View style={styles.seperatorTwo} /> */}
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.nameContainer}>
           <Text style={styles.name}>Hi, {nickname}</Text>
@@ -105,7 +99,6 @@ function MyPage({ route }) {
         <View style={styles.progressContainer}>
           <View style={styles.progressContainerStem}>
             <Svg height="170" width="170" viewBox="0 0 100 100">
-              {/* 배경 원 */}
               <Circle
                 cx="50"
                 cy="50"
@@ -115,27 +108,22 @@ function MyPage({ route }) {
               />
             </Svg>
             <ImageBackground
-              source={require("./assets/img/myPageTree.png")} // 이미지 경로 확인
+              source={require("./assets/img/myPageTree.png")}
               style={styles.imageBackground}
-              // 이미지 스타일을 여기에 추가합니다
-            >
-              {/* 만약 이미지 위에 다른 요소를 놓고 싶다면 여기에 추가하세요. 예를 들어: */}
-              {/* <Text>여기에 텍스트</Text> */}
-            </ImageBackground>
+            ></ImageBackground>
           </View>
           <View style={styles.progressContainerCircle}>
             <CircularProgress
-              size={200} // 원의 크기
-              width={13} // 선의 두께
-              fill={(quizScoreThisWeek / totalQuizScoreGoal) * 100} // 현재 진행률
-              tintColor="#5B882C" // 원의 색깔
-              backgroundColor="#cccccc" // 원의 배경색
+              size={200}
+              width={13}
+              fill={(quizScoreThisWeek / totalQuizScoreGoal) * 100}
+              tintColor="#5B882C"
+              backgroundColor="#cccccc"
               rotation={0}
               lineCap="round"
             ></CircularProgress>
           </View>
         </View>
-        {/* 이번주 누적 데일리 퀴즈 점수 / 목표 누적 데일리 퀴즈 점수 */}
         <View style={styles.progressTextContainer}>
           <Text style={styles.progressTextTitle}>Progress of the Week</Text>
           <Text style={styles.progressText}>
@@ -175,8 +163,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoContainer: {
-    flexDirection: "row", // Aligns children in a row
-    alignItems: "center", // Centers children vertically in the container
+    flexDirection: "row",
+    alignItems: "center",
     marginHorizontal: "3%",
     maxHeight: "10%",
     paddingTop: "1%",
@@ -184,31 +172,31 @@ const styles = StyleSheet.create({
   image: {
     width: 40,
     height: 40,
-    marginLeft: "3%", // Add some margin to the right of the image, if needed
+    marginLeft: "3%",
   },
   logoText: {
     fontSize: 20,
     color: "#5B882C",
-    fontWeight: "400", // Makes the font weight thinner
-    flex: 1, // Takes up all available space in the row
-    textAlign: "center", // Centers the text horizontally,
+    fontWeight: "400",
+    flex: 1,
+    textAlign: "center",
     right: "260%",
   },
   seperatorOne: {
     marginTop: 5,
     marginBottom: 8,
-    height: 3, // 선의 두께를 조절합니다.
-    width: "100%", // 구분선의 너비를 조절합니다. 로고와 텍스트의 절반만큼의 길이로 설정합니다.
-    backgroundColor: "#5B882C", // 초록색으로 설정합니다.
-    borderWidth: 1, // 선의 두께를 조절합니다.
-    borderColor: "#5B882C", // 초록색으로 경계선을 설정합니다.
+    height: 3,
+    width: "100%",
+    backgroundColor: "#5B882C",
+    borderWidth: 1,
+    borderColor: "#5B882C",
   },
   seperatorTwo: {
-    height: 1, // 선의 두께를 조절합니다.
-    width: "100%", // 구분선의 너비를 조절합니다. 로고와 텍스트의 절반만큼의 길이로 설정합니다.
-    backgroundColor: "#5B882C", // 초록색으로 설정합니다.
-    borderWidth: 1, // 선의 두께를 조절합니다.
-    borderColor: "#5B882C", // 초록색으로 경계선을 설정합니다.
+    height: 1,
+    width: "100%",
+    backgroundColor: "#5B882C",
+    borderWidth: 1,
+    borderColor: "#5B882C",
     marginTop: 5,
     marginBottom: 8,
   },
@@ -223,11 +211,11 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   imageBackground: {
-    width: 170, // 이미지의 너비
-    height: 170, // 이미지의 높이
-    position: "absolute", // Svg 컴포넌트 위에 겹치도록 설정
-    top: "-1%", // Svg 컴포넌트와 동일한 위치에
-    left: "0%", // Svg 컴포넌트와 동일한 위치에
+    width: 170,
+    height: 170,
+    position: "absolute",
+    top: "-1%",
+    left: "0%",
   },
   progressContainer: {
     flexDirection: "column",
@@ -295,24 +283,24 @@ const styles = StyleSheet.create({
     marginTop: 25,
   },
   badge: {
-    width: 60, // 뱃지의 너비
-    height: 60, // 뱃지의 높이
-    marginHorizontal: 5, // 좌우 마진,
+    width: 60,
+    height: 60,
+    marginHorizontal: 5,
     marginVertical: 5,
   },
   button: {
-    backgroundColor: "#5B882C", // 버튼의 배경색
-    padding: 10, // 버튼 안쪽의 여백
-    borderRadius: 5, // 버튼의 모서리 둥글기
-    alignItems: "center", // 텍스트를 중앙에 정렬
+    backgroundColor: "#5B882C",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
     justifyContent: "center",
     maxWidth: "50%",
     marginHorizontal: "25%",
     marginVertical: "5%",
   },
   text: {
-    color: "white", // 텍스트 색상
-    fontSize: 16, // 텍스트 크기
+    color: "white",
+    fontSize: 16,
   },
   scroll: {
     minWidth: "100%",

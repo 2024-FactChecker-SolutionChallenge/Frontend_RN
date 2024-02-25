@@ -32,22 +32,18 @@ const LoginScreen = ({
     })
       .then((response) => {
         if (!response.ok) {
-          // throw new Error('Login failed'); // 로그인 실패 처리
           alert("Login falied. Please Retry");
         }
 
-        // 토큰 추출
         const accessToken = response.headers.get("access_token");
         const refreshToken = response.headers.get("refresh_token");
 
         if (accessToken && refreshToken) {
-          // 토큰 저장
           AsyncStorage.setItem("accessToken", accessToken);
           AsyncStorage.setItem("refreshToken", refreshToken);
           setAccessToken(accessToken);
           setRefreshToken(refreshToken);
 
-          // 인증 상태 업데이트
           setIsAuthenticated(true);
         }
 
@@ -58,12 +54,10 @@ const LoginScreen = ({
       })
       .catch((error) => {
         console.error(error);
-        // 에러 처리 로직
       });
   };
 
   const navigateToSignup = () => {
-    // 회원가입 화면으로 이동
     navigation.navigate("Signup");
   };
 
@@ -71,7 +65,7 @@ const LoginScreen = ({
     <View style={styles.container}>
       <Image
         style={styles.image}
-        source={require("./assets/img/truetree_logo.png")} // 이미지 파일 경로 지정
+        source={require("./assets/img/truetree_logo.png")}
       />
       <Text style={styles.title}>TRUETREE</Text>
       <TextInput
