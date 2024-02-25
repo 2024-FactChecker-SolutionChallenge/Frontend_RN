@@ -1,6 +1,8 @@
+// https://joylee-developer.tistory.com/158
+
 {
   "expo": {
-    "scheme": "TrueTree",
+    "scheme": "truetree",
     "name": "TrueTree",
     "slug": "TrueTree",
     "version": "1.0.0",
@@ -15,13 +17,19 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "plugins": [
+      ["expo-build-properties", {
+        "android": {
+          "usesCleartextTraffic": true
+        }
+      }]
+    ],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
       },
       "package": "com.yulleta.TrueTree"
     },
